@@ -1,7 +1,7 @@
-import React from "react";
+import { redirect } from "next/navigation";
 
 const Dashboard = () => {
-  return <div>Dashboard</div>;
+  return redirect("/analytics");
 };
 
 export default Dashboard;

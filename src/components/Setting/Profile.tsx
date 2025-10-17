@@ -1,53 +1,52 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Check } from "lucide-react"
-import addImage from "@/lib/assets/icons/addImage.png"
+import { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Check } from "lucide-react";
+import addImage from "@/lib/assets/icons/addImage.png";
 
 type FormState = {
-  firstName: string
-  email: string
-  photo: string | null 
-}
+  firstName: string;
+  email: string;
+  photo: string | null;
+};
 
 export default function ProfileForm() {
   const [form, setForm] = useState<FormState>({
     firstName: "Emmanuel Adebayo",
     email: "emmanuel@gmail.com",
     photo: null,
-  })
+  });
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
     reader.onloadend = () => {
-      setForm((prev) => ({ ...prev, photo: reader.result as string }))
-    }
-    reader.readAsDataURL(file)
-  }
+      setForm((prev) => ({ ...prev, photo: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // handle submit - send `form` to API
-    console.log("Submitting form:", form)
-  }
+    console.log("Submitting form:", form);
+  };
 
   return (
-    <div className=" py-10">
+    <div className="py-10">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-md space-y-6 bg-white rounded-xl p-8"
-      >
+        className="w-full max-w-md space-y-6 bg-white rounded-xl p-8">
         {/* Profile Photo Section */}
         <div className="flex items-center space-x-6">
           <div className="relative">
@@ -69,16 +68,21 @@ export default function ProfileForm() {
           </div>
 
           <div className="flex flex-col">
-            <Label className="font-medium text-[#878787] mb-2">Profile photo</Label>
+            <Label className="font-medium text-[#878787] mb-2">
+              Profile photo
+            </Label>
             <p className="text-sm text-[#878787]">This image will be</p>
             <p className="text-sm text-[#878787]">displayed on your profile</p>
 
             <div className="mt-4">
               <label
                 htmlFor="photo"
-                className="w-[160px] h-[36px] rounded-[8px] inline-flex items-center space-x-2 border border-[#60269E] text-[#60269E] font-medium text-sm px-3 py-1.5 cursor-pointer hover:bg-[#51A3DA]/10 transition"
-              >
-                <Image src={addImage} alt="camera icon" className="w-[20px] h-[20px]"/>
+                className="w-[160px] h-[36px] rounded-[8px] inline-flex items-center space-x-2 border border-[#60269E] text-[#60269E] font-medium text-sm px-3 py-1.5 cursor-pointer hover:bg-[#51A3DA]/10 transition">
+                <Image
+                  src={addImage}
+                  alt="camera icon"
+                  className="w-[20px] h-[20px]"
+                />
                 <span>Change Photo</span>
                 <input
                   id="photo"
@@ -128,11 +132,10 @@ export default function ProfileForm() {
         {/* Save Button */}
         <Button
           type="submit"
-          className="w-[546px] h-[64px] bg-gradient text-white rounded-[12px] font-semibold hover:opacity-90 transition"
-        >
+          className="w-[546px] h-[64px] bg-gradient text-white rounded-[12px] font-semibold hover:opacity-90 transition">
           Save Changes
         </Button>
       </form>
     </div>
-  )
+  );
 }

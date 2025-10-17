@@ -10,22 +10,56 @@ import Image from "next/image";
 import { InviteModal } from "./InviteModal";
 
 type Teams = {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    date: string;
-    status: "Active" | "Deactive";
-}[]
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  date: string;
+  status: "Active" | "Deactive";
+}[];
 
 const teamList: Teams = [
-    { id: "#0001",name: "Cooper Siphron",email: "thekdfisher@email.com", role: "Admin", date: "2025-10-16", status: "Active",},
-    { id: "#0001",name: "Cooper Siphron",email: "thekdfisher@email.com", role: "Admin", date: "2025-10-16", status: "Active",},
-    { id: "#0001",name: "Cooper Siphron",email: "thekdfisher@email.com", role: "Admin", date: "2025-10-16", status: "Active",},
-    { id: "#0001",name: "Cooper Siphron",email: "thekdfisher@email.com", role: "Admin", date: "2025-10-16", status: "Active",},
-    { id: "#0001",name: "Cooper Siphron",email: "thekdfisher@email.com", role: "Admin", date: "2025-10-16", status: "Active",}
-]
-
+  {
+    id: "#0001",
+    name: "Cooper Siphron",
+    email: "thekdfisher@email.com",
+    role: "Admin",
+    date: "2025-10-16",
+    status: "Active",
+  },
+  {
+    id: "#0001",
+    name: "Cooper Siphron",
+    email: "thekdfisher@email.com",
+    role: "Admin",
+    date: "2025-10-16",
+    status: "Active",
+  },
+  {
+    id: "#0001",
+    name: "Cooper Siphron",
+    email: "thekdfisher@email.com",
+    role: "Admin",
+    date: "2025-10-16",
+    status: "Active",
+  },
+  {
+    id: "#0001",
+    name: "Cooper Siphron",
+    email: "thekdfisher@email.com",
+    role: "Admin",
+    date: "2025-10-16",
+    status: "Active",
+  },
+  {
+    id: "#0001",
+    name: "Cooper Siphron",
+    email: "thekdfisher@email.com",
+    role: "Admin",
+    date: "2025-10-16",
+    status: "Active",
+  },
+];
 
 export default function TeamPage() {
   const [search, setSearch] = useState("");
@@ -52,43 +86,41 @@ export default function TeamPage() {
   };
 
   return (
-    <div className="max-w-6xl py-3 font-satoshi">
+    <div className="py-3 font-satoshi">
       {/* Header */}
       <div className="flex justify-between">
-            {/* Search */}
-            <div className="w-[212px] mb-4 flex md:w-[312px] h-[38px] items-center gap-2 max-w-xs rounded-lg border border-gray-300 bg-white/60 px-3 py-1 shadow-sm focus-within:ring-2 focus-within:ring-[#51A3DA]/40 transition">
-                <Image src={searchIcon} alt="Search" className="w-5 h-5 opacity-70" />
-                <Input
-                    type="text"
-                    placeholder="Search"
-                    value={search}
-                    onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1); // reset to page 1 on search
-                    }}
-                    className="flex-1 bg-transparent border-none focus-visible:ring-0 focus:outline-none text-sm placeholder:text-gray-400"
-                />
-            </div>
+        {/* Search */}
+        <div className="w-[212px] mb-4 flex md:w-[312px] h-[38px] items-center gap-2 max-w-xs rounded-lg border border-gray-300 bg-white/60 px-3 py-1 shadow-sm focus-within:ring-2 focus-within:ring-[#51A3DA]/40 transition">
+          <Image src={searchIcon} alt="Search" className="w-5 h-5 opacity-70" />
+          <Input
+            type="text"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1); // reset to page 1 on search
+            }}
+            className="flex-1 bg-transparent border-none focus-visible:ring-0 focus:outline-none text-sm placeholder:text-gray-400"
+          />
+        </div>
 
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex gap-4">
-                <Button className="px-4 py-2 h-[38px] w-[147px] rounded-[8px] text-white bg-gradient">
-                    <Image src={download} alt="download" className="w-5 h-5 mr-2"/>
-                    <span>Export CSV</span>
-                </Button>
-                {/* <Button className="px-4 py-2 h-[38px] w-[147px] rounded-[8px] text-white bg-gradient">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex gap-4">
+            <Button className="px-4 py-2 h-[38px] w-[147px] rounded-[8px] text-white bg-gradient">
+              <Image src={download} alt="download" className="w-5 h-5 mr-2" />
+              <span>Export CSV</span>
+            </Button>
+            {/* <Button className="px-4 py-2 h-[38px] w-[147px] rounded-[8px] text-white bg-gradient">
                     <Image src={user} alt="user" className="w-5 h-5 mr-2"/>
                     <span>Invite Member</span>
                 </Button> */}
-                <InviteModal />
-                </div>
-            </div>
+            <InviteModal />
+          </div>
+        </div>
       </div>
-           
+
       {/* Team Members Info */}
-      <p className="text-gray-500 mb-2">
-        Team Members- 4
-      </p>
+      <p className="text-gray-500 mb-2">Team Members- 4</p>
 
       {/* Table */}
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
@@ -130,8 +162,7 @@ export default function TeamPage() {
                       team.status === "Active"
                         ? "bg-[#ECFDF3] text-[#027A48]"
                         : "bg-[#FEF6F7] text-[#E71D36]"
-                    }`}
-                  >
+                    }`}>
                     {team.status}
                   </span>
                 </td>
@@ -159,8 +190,7 @@ export default function TeamPage() {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold"
-          >
+            className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold">
             &lt;
           </button>
 
@@ -172,8 +202,7 @@ export default function TeamPage() {
                 currentPage === page
                   ? "border-[#2390FA] text-[#2390FA]"
                   : "border-gray-300 hover:bg-gray-100"
-              }`}
-            >
+              }`}>
               {page}
             </button>
           ))}
@@ -181,8 +210,7 @@ export default function TeamPage() {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold"
-          >
+            className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold">
             &gt;
           </button>
         </div>

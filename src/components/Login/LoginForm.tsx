@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-import { Eye, EyeOff } from "lucide-react" // 👈 icons for show/hide
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react"; // 👈 icons for show/hide
 
-import { loginSchema, LoginSchemaData } from "@/lib/validation"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "../ui/checkbox"
+import { loginSchema, LoginSchemaData } from "@/lib/validation";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "../ui/checkbox";
 import {
   Form,
   FormControl,
@@ -15,13 +15,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
-  const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false) // 👈 toggle state
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
 
   const form = useForm<LoginSchemaData>({
     resolver: zodResolver(loginSchema),
@@ -29,16 +29,18 @@ export function LoginForm() {
       email: "",
       password: "",
     },
-  })
+  });
 
   function onSubmit(values: LoginSchemaData) {
-    console.log(values)
-    router.push("/")
+    console.log(values);
+    router.push("/");
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 font-satoshi">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 font-satoshi">
         {/* Email */}
         <FormField
           control={form.control}
@@ -77,8 +79,7 @@ export function LoginForm() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-3 flex items-center text-gray-300 hover:text-white"
-                    tabIndex={-1}
-                  >
+                    tabIndex={-1}>
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
@@ -100,11 +101,10 @@ export function LoginForm() {
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-[400px] h-[48px] rounded-[8px] bg-gradient"
-        >
+          className="w-[400px] h-[48px] rounded-[8px] bg-gradient">
           Log in
         </Button>
       </form>
     </Form>
-  )
+  );
 }

@@ -1,3 +1,4 @@
+@config "../../tailwind.config.ts";
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -124,3 +125,9 @@
 button {
   cursor: pointer !important;
 }
+
+.bg-gradient {
+	@apply bg-gradient-to-r from-[#51A3DA] to-[#60269E];
+}
+
+

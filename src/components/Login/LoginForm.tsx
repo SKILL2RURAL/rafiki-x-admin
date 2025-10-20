@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function LoginForm() {
   const router = useRouter();
@@ -95,7 +96,7 @@ export function LoginForm() {
             <Checkbox />
             <p>Remember me</p>
           </div>
-          <a href="/">Forgot Password?</a>
+          <Link href="/">Forgot Password?</Link>
         </div>
 
         {/* Submit Button */}

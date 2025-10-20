@@ -52,7 +52,7 @@ export default function ProfileForm() {
           <div className="relative">
             <div className="w-[120px] h-[120px] rounded-full bg-gradient-to-br from-[#51A3DA] to-[#60269E] flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
               {form.photo ? (
-                <img
+                <Image
                   src={form.photo}
                   alt="Profile photo"
                   className="w-full h-full object-cover rounded-full"

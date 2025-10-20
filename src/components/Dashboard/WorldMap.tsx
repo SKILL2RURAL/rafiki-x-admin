@@ -9,6 +9,27 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 
+interface GeoGeometry {
+  type: string;
+  coordinates: number[][][] | number[][][][];
+}
+
+interface GeoProperties {
+  name: string;
+  [key: string]: unknown;
+}
+
+interface GeoFeature {
+  rsmKey: string;
+  type: string;
+  geometry: GeoGeometry;
+  properties: GeoProperties;
+}
+
+interface GeographiesChildProps {
+  geographies: GeoFeature[];
+}
+
 // Sample user data with locations
 const userLocations = [
   { name: "Lagos, Nigeria", coordinates: [3.3792, 6.5244], users: 1200 },
@@ -66,12 +87,11 @@ export default function WorldMap() {
         style={{
           width: "100%",
           height: "100%",
-        }}
-      >
+        }}>
         <ZoomableGroup zoom={1}>
           <Geographies geography={geoUrl}>
-            {({ geographies }: { geographies: any[] }) =>
-              geographies.map((geo: any) => (
+            {({ geographies }: GeographiesChildProps) =>
+              geographies.map((geo: GeoFeature) => (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
@@ -103,8 +123,7 @@ export default function WorldMap() {
           {userLocations.map((location, index) => (
             <Marker
               key={index}
-              coordinates={[location.coordinates[0], location.coordinates[1]]}
-            >
+              coordinates={[location.coordinates[0], location.coordinates[1]]}>
               <g>
                 {/* Outer glow circle */}
                 <circle
@@ -136,8 +155,7 @@ export default function WorldMap() {
           style={{
             left: mousePosition.x + 10,
             top: mousePosition.y - 10,
-          }}
-        >
+          }}>
           <div className="flex items-center gap-2">
             <div className="w-4 h-3 bg-gradient-to-r from-green-500 to-green-600 rounded-sm"></div>
             <span className="text-sm font-medium text-gray-900">

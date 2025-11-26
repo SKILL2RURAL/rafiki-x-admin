@@ -2,7 +2,7 @@
 import Password from "@/components/Setting/Password";
 import ProfileForm from "@/components/Setting/Profile";
 import TeamPage from "@/components/Setting/Team";
-import React, { useState } from "react";
+import { useState } from "react";
 
 type Tab = "profile" | "password" | "team";
 
@@ -42,7 +42,8 @@ const SettingsPage = () => {
             }
             onClick={() => {
               setTab(tabItem as Tab);
-            }}>
+            }}
+          >
             {tabItem.charAt(0).toUpperCase() + tabItem.slice(1)}
           </div>
         ))}

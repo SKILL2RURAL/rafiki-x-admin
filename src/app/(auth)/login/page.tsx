@@ -12,7 +12,7 @@ const LoginPage = () => {
         alt="background image"
         className="h-screen w-screen z-[-1] top-0 left-0 opacity-50"
       />
-      <div className="absolute top-0 left-0 z-[50] h-screen w-screen flex flex-col items-center justify-center lg:grid grid-cols-2 gap-5">
+      <div className="absolute top-0 left-0 z-50 h-screen w-screen flex flex-col items-center justify-center lg:grid grid-cols-2 gap-5">
         <div className="flex justify-center items-center px-10">
           <Image
             src={logo}

@@ -1,21 +1,23 @@
+import AuthWrapper from "@/components/Layout/AuthWrapper";
 import Navbar from "@/components/Dashboard/Layout/Navbar";
 import Sidebar from "@/components/Dashboard/Layout/Sidebar";
-import React from "react";
 
 export default function DashboardLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <div className="flex h-screen w-screen [--sidebar-width:280px] [--navbar-height:78px]">
-      <Sidebar />
-      <div>
-        <Navbar />
-        <div className="p-5 pt-10 h-[calc(100vh-var(--navbar-height))] overflow-y-auto">
-          {children}
-        </div>
-      </div>
-    </div>
+    <AuthWrapper>
+      <section className="flex h-screen w-full">
+        <Sidebar />
+        <main className="flex-1 flex flex-col">
+          <Navbar />
+          <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+            {children}
+          </div>
+        </main>
+      </section>
+    </AuthWrapper>
   );
 }

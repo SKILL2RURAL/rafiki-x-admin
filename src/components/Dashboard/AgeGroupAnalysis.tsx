@@ -1,3 +1,4 @@
+import { useAnalyticsOverview } from "@/hook/useAnalytics";
 import React from "react";
 import {
   BarChart,
@@ -38,12 +39,23 @@ const CustomLabel = (props: CustomLabelProps) => {
       fontSize={16}
       fontWeight={400}
     >
-      {value} Users
+      {value} {value === 1 ? "user" : "users"}
     </text>
   );
 };
 
 export default function AgeGroupAnalysis() {
+  const { data, isLoading } = useAnalyticsOverview();
+  const ageGroups = data?.ageGroupDistribution || [];
+
+  if (isLoading) {
+    return <div>Loading data</div>;
+  }
+
+  if (!ageGroups.length) {
+    return null;
+  }
+
   return (
     <div className="w-full flex items-center justify-center">
       <div className="bg-white rounded-3xl shadow-sm p-12 max-w-4xl w-full">
@@ -60,31 +72,32 @@ export default function AgeGroupAnalysis() {
         <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={data}
+              data={ageGroups}
               layout="vertical"
-              margin={{ top: 10, right: 120, left: 0, bottom: 10 }}
+              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
             >
               <XAxis
                 type="number"
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "#9ca3af", fontSize: 14 }}
-                ticks={[0, 10, 20, 50, 100, 200, 500, 1000]}
+                // ticks={[0, 10, 20, 50, 100, 200, 500, 1000]}
                 tickFormatter={(value) => (value === 1000 ? "1K" : value)}
               />
               <YAxis
                 type="category"
-                dataKey="ageGroup"
+                dataKey="label"
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "#1f2937", fontSize: 16, fontWeight: 400 }}
                 width={100}
               />
-              <Bar dataKey="users" radius={[0, 8, 8, 0]} barSize={32}>
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+              <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={32}>
+                {ageGroups.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill="blue" />
                 ))}
-                <LabelList dataKey="users" content={CustomLabel} />
+                <LabelList dataKey="count" content={CustomLabel as any} />
+                {/* <LabelList dataKey="count" /> */}
               </Bar>
             </BarChart>
           </ResponsiveContainer>

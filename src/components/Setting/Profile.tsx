@@ -1,25 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check } from "lucide-react";
 import addImage from "@/lib/assets/icons/addImage.png";
+import { useUser } from "@/hook/useAuth"; // Corrected hook
+import { Spinner } from "../ui/spinner";
 
 type FormState = {
   firstName: string;
   email: string;
   photo: string | null;
+  lastName: string;
 };
 
 export default function ProfileForm() {
+  const { data: user, isLoading } = useUser();
   const [form, setForm] = useState<FormState>({
-    firstName: "Emmanuel Adebayo",
-    email: "emmanuel@gmail.com",
+    firstName: "",
+    email: "",
     photo: null,
+    lastName: "",
   });
+
+  // Populate form with user data once it's loaded
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        firstName: user.firstName || "",
+        email: user.email || "",
+        lastName: user.lastName || "",
+      }));
+    }
+  }, [user]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -42,11 +59,20 @@ export default function ProfileForm() {
     console.log("Submitting form:", form);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-10">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <div className="py-10">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-md space-y-6 bg-white rounded-xl p-8">
+        className="w-fit space-y-6 bg-white rounded-xl p-8"
+      >
         {/* Profile Photo Section */}
         <div className="flex items-center space-x-6">
           <div className="relative">
@@ -58,7 +84,10 @@ export default function ProfileForm() {
                   className="w-full h-full object-cover rounded-full"
                 />
               ) : (
-                <span>OO</span>
+                <span>
+                  {form.firstName?.charAt(0).toUpperCase()}
+                  {form.firstName?.split(" ")[1]?.charAt(0).toUpperCase()}
+                </span>
               )}
             </div>
 
@@ -77,7 +106,8 @@ export default function ProfileForm() {
             <div className="mt-4">
               <label
                 htmlFor="photo"
-                className="w-[160px] h-[36px] rounded-[8px] inline-flex items-center space-x-2 border border-[#60269E] text-[#60269E] font-medium text-sm px-3 py-1.5 cursor-pointer hover:bg-[#51A3DA]/10 transition">
+                className="w-[160px] h-[36px] rounded-[8px] inline-flex items-center space-x-2 border border-[#60269E] text-[#60269E] font-medium text-sm px-3 py-1.5 cursor-pointer hover:bg-[#51A3DA]/10 transition"
+              >
                 <Image
                   src={addImage}
                   alt="camera icon"
@@ -97,17 +127,17 @@ export default function ProfileForm() {
           </div>
         </div>
 
-        {/* First Name */}
         <div className="space-y-1">
           <Label htmlFor="firstName" className="text-[#878787]">
-            First name
+            Name
           </Label>
           <Input
-            id="firstName"
-            name="firstName"
+            id="Name"
+            name="Name"
             type="text"
             placeholder="Emmanuel Adebayo"
-            value={form.firstName}
+            value={form.firstName + " " + form.lastName}
+            disabled
             onChange={handleInput}
             className="w-[546px] h-[64px] rounded-md border p-4 border-gray-300 bg-gray-50 text-gray-700 focus:ring-2 focus:ring-[#51A3DA]"
           />
@@ -126,13 +156,15 @@ export default function ProfileForm() {
             value={form.email}
             onChange={handleInput}
             className="w-[546px] h-[64px] rounded-md border border-gray-200 bg-gray-100 text-gray-700"
+            readOnly // Email should generally not be editable
           />
         </div>
 
         {/* Save Button */}
         <Button
           type="submit"
-          className="w-[546px] h-[64px] bg-gradient text-white rounded-[12px] font-semibold hover:opacity-90 transition">
+          className="w-[546px] h-[64px] bg-gradient text-white rounded-[12px] font-semibold hover:opacity-90 transition"
+        >
           Save Changes
         </Button>
       </form>

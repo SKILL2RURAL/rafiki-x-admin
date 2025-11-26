@@ -8,6 +8,7 @@ import user from "@/lib/assets/icons/user.png";
 import searchIcon from "@/lib/assets/icons/search.png";
 import Image from "next/image";
 import { InviteModal } from "./InviteModal";
+import { useAdmins } from "@/hook/useAdmin";
 
 type Teams = {
   id: string;
@@ -62,9 +63,12 @@ const teamList: Teams = [
 ];
 
 export default function TeamPage() {
+  const { data: admins } = useAdmins();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5; // items per page
+
+  console.log(admins);
 
   // Filter teams based on search
   const filteredTeams = useMemo(() => {
@@ -162,7 +166,8 @@ export default function TeamPage() {
                       team.status === "Active"
                         ? "bg-[#ECFDF3] text-[#027A48]"
                         : "bg-[#FEF6F7] text-[#E71D36]"
-                    }`}>
+                    }`}
+                  >
                     {team.status}
                   </span>
                 </td>
@@ -190,7 +195,8 @@ export default function TeamPage() {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold">
+            className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold"
+          >
             &lt;
           </button>
 
@@ -202,7 +208,8 @@ export default function TeamPage() {
                 currentPage === page
                   ? "border-[#2390FA] text-[#2390FA]"
                   : "border-gray-300 hover:bg-gray-100"
-              }`}>
+              }`}
+            >
               {page}
             </button>
           ))}
@@ -210,7 +217,8 @@ export default function TeamPage() {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold">
+            className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold"
+          >
             &gt;
           </button>
         </div>

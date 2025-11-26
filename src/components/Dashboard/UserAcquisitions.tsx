@@ -30,7 +30,7 @@ export default function UserAcquisitions() {
   const totalSignups = data.reduce((sum, item) => sum + item.signups, 0);
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full">
       <div className="bg-white rounded-lg shadow-sm p-8 h-full">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
@@ -55,8 +55,7 @@ export default function UserAcquisitions() {
                   activeView === "Month"
                     ? "bg-white text-gray-900 shadow-sm"
                     : "text-gray-500"
-                }`}
-              >
+                }`}>
                 Month
               </button>
               <button
@@ -65,8 +64,7 @@ export default function UserAcquisitions() {
                   activeView === "Year"
                     ? "bg-white text-gray-900 shadow-sm"
                     : "text-gray-500"
-                }`}
-              >
+                }`}>
                 Year
               </button>
             </div>
@@ -79,8 +77,7 @@ export default function UserAcquisitions() {
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "right 12px center",
-              }}
-            >
+              }}>
               <option>2025</option>
               <option>2024</option>
               <option>2023</option>
@@ -89,17 +86,16 @@ export default function UserAcquisitions() {
         </div>
 
         {/* Chart */}
-        <div className="h-[calc(100%-120px)]">
+        <div className="h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
-              margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
-            >
+              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
               <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="barGradient" x1="0.4" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                  <stop offset="50%" stopColor="#6366f1" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity={1} />
+                  <stop offset="50%" stopColor="#60269E" stopOpacity={1} />
+                  {/* <stop offset="100%" stopColor="#8b5cf6" stopOpacity={1} /> */}
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -119,8 +115,6 @@ export default function UserAcquisitions() {
                 tickLine={false}
                 tick={{ fill: "#9ca3af", fontSize: 14 }}
                 tickFormatter={(value) => `${value / 1000}k`}
-                ticks={[0, 1000, 2000, 4000, 6000, 8000, 10000, 12000]}
-                dx={-10}
               />
               <Bar
                 dataKey="signups"

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react"; // 👈 icons for show/hide
+import { Eye, EyeOff } from "lucide-react";
 
 import { loginSchema, LoginSchemaData } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
@@ -19,10 +19,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
 
 export function LoginForm() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginSchemaData>({
     resolver: zodResolver(loginSchema),
@@ -32,9 +35,30 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: LoginSchemaData) {
-    console.log(values);
-    router.push("/");
+  async function onSubmit(values: LoginSchemaData) {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        // The httpOnly cookie is set by the server.
+        // We just need to redirect on success.
+        router.push("/");
+        router.refresh(); // Recommended to refresh server components and get new data
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login request failed:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -52,8 +76,9 @@ export function LoginForm() {
               <FormControl>
                 <Input
                   placeholder="Enter your email address"
+                  required
                   {...field}
-                  className="w-[400px] h-[40px] rounded-md border border-white/20 bg-[#D0D5DD]/20 px-4 py-2 text-white placeholder:text-gray-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 backdrop-blur-sm"
+                  className="w-[400px] h-[40px] rounded-md border border-white/20 bg-[#D0D5DD]/20 px-4 py-2 text-white placeholder:text-gray-200 focus:outline-none  focus:ring-fuchsia-500/50 backdrop-blur-sm"
                 />
               </FormControl>
               <FormMessage className="text-lg text-red-600 !important" />
@@ -73,6 +98,7 @@ export function LoginForm() {
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter Password"
+                    required
                     {...field}
                     className="w-full h-[40px] rounded-md border border-white/20 bg-[#D0D5DD]/20 px-4 pr-10 py-2 text-white placeholder:text-gray-200 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 backdrop-blur-sm"
                   />
@@ -102,8 +128,9 @@ export function LoginForm() {
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-[400px] h-[48px] rounded-[8px] bg-gradient">
-          Log in
+          disabled={isLoading}
+          className="w-[400px] h-[48px] rounded-[8px] bg-gradient border text-[16px] font-[500] border-white">
+          {isLoading ? <Spinner color="white" /> : "Log in"}
         </Button>
       </form>
     </Form>

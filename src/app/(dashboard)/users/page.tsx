@@ -1,5 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useActivateUser , useDeactivateUser, useAdminUsers } from "@/hook/useUser";
+
 import {
   Table,
   TableBody,
@@ -23,6 +25,10 @@ import {
 const UsersPage = () => {
   const router = useRouter();
   const [active, setActive] = React.useState("All");
+  const { data: users, isLoading } = useAdminUsers();
+  const activateUser = useActivateUser();
+  const deactivateUser = useDeactivateUser();
+
 
   const tableData = [
     {
@@ -129,7 +135,7 @@ const UsersPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tableData.map((item) => (
+            {(users ?? []).map((item) => (
               <TableRow
                 key={item.id}
                 className="h-[70px] text-[14px] cursor-pointer hover:bg-[#F9FAFB]"
@@ -147,7 +153,7 @@ const UsersPage = () => {
                       />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <p>{item.name}</p>
+                    <p>{item.fullName}</p>
                   </div>
                 </TableCell>
                 <TableCell className="text-[14px]">{item.email}</TableCell>
@@ -167,11 +173,15 @@ const UsersPage = () => {
                         <EllipsisVertical />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="p-3">
-                        <DropdownMenuItem className="text-[#313131] font-bold mb-3">
+                        <DropdownMenuItem className="text-[#313131] font-bold mb-3"
+                        onClick={() => activateUser.mutate(item.id)}
+                        >
                           Activate User
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-[#313131] font-bold my-3">
+                        <DropdownMenuItem className="text-[#313131] font-bold my-3"
+                        onClick={() => deactivateUser.mutate(item.id)}
+                        >
                           Deactivate User
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />

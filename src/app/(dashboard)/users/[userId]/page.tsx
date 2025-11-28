@@ -3,6 +3,9 @@
 import { ArrowLeft, Download, MessageSquareMore } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useParams } from "next/navigation";
+import { useAdminUserById, useUserBillings, useSendMessage } from "@/hook/useUser";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import {
@@ -17,6 +20,13 @@ import MessageUserModal from "@/components/Dashboard/MessageUserModal";
 
 const UserDetailsPage = () => {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const { userId }: any = useParams();
+
+  const { data: user } = useAdminUserById(userId);
+  const { data: billings } = useUserBillings(userId);
+
+  const sendMessage = useSendMessage();
+
 
   const tableData = [
     {
@@ -85,7 +95,7 @@ const UserDetailsPage = () => {
           <div className="h-4" />
 
           {/* User Name  */}
-          <h3 className="font-bold text-[18px]">John Doe</h3>
+          <h3 className="font-bold text-[18px]">{user?.fullName}</h3>
         </div>
 
         <button
@@ -300,7 +310,8 @@ const UserDetailsPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tableData.map((item) => (
+            {(billings ?? []).map((item) => (
+
               <TableRow
                 key={item.id}
                 className="h-[70px] text-[14px] cursor-pointer hover:bg-[#F9FAFB]"
@@ -310,7 +321,7 @@ const UserDetailsPage = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <p>{item.name}</p>
+                    <p>{item.plan}</p>
                   </div>
                 </TableCell>
                 <TableCell className="text-[14px]">
@@ -350,6 +361,7 @@ const UserDetailsPage = () => {
       <MessageUserModal
         isOpen={isMessageModalOpen}
         onClose={() => setIsMessageModalOpen(false)}
+        userId={userId}
       />
     </div>
   );

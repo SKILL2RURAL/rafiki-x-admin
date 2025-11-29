@@ -1,93 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAdmins } from "@/hook/useAdmin";
 import download from "@/lib/assets/icons/download.png";
-import user from "@/lib/assets/icons/user.png";
 import searchIcon from "@/lib/assets/icons/search.png";
 import Image from "next/image";
+import { useState } from "react";
 import { InviteModal } from "./InviteModal";
-import { useAdmins } from "@/hook/useAdmin";
-
-type Teams = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  date: string;
-  status: "Active" | "Deactive";
-}[];
-
-const teamList: Teams = [
-  {
-    id: "#0001",
-    name: "Cooper Siphron",
-    email: "thekdfisher@email.com",
-    role: "Admin",
-    date: "2025-10-16",
-    status: "Active",
-  },
-  {
-    id: "#0001",
-    name: "Cooper Siphron",
-    email: "thekdfisher@email.com",
-    role: "Admin",
-    date: "2025-10-16",
-    status: "Active",
-  },
-  {
-    id: "#0001",
-    name: "Cooper Siphron",
-    email: "thekdfisher@email.com",
-    role: "Admin",
-    date: "2025-10-16",
-    status: "Active",
-  },
-  {
-    id: "#0001",
-    name: "Cooper Siphron",
-    email: "thekdfisher@email.com",
-    role: "Admin",
-    date: "2025-10-16",
-    status: "Active",
-  },
-  {
-    id: "#0001",
-    name: "Cooper Siphron",
-    email: "thekdfisher@email.com",
-    role: "Admin",
-    date: "2025-10-16",
-    status: "Active",
-  },
-];
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function TeamPage() {
   const { data: admins } = useAdmins();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5; // items per page
-
-  console.log(admins);
-
-  // Filter teams based on search
-  const filteredTeams = useMemo(() => {
-    return teamList.filter(
-      (team) =>
-        team.name.toLowerCase().includes(search.toLowerCase()) ||
-        team.email.toLowerCase().includes(search.toLowerCase()) ||
-        team.role.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [search]);
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredTeams.length / pageSize);
-  const startIdx = (currentPage - 1) * pageSize;
-  const paginatedTeams = filteredTeams.slice(startIdx, startIdx + pageSize);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
-  };
 
   return (
     <div className="py-3 font-satoshi">
@@ -143,38 +69,47 @@ export default function TeamPage() {
           </thead>
 
           <tbody>
-            {paginatedTeams.map((team, idx) => (
-              <tr key={idx} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-4">
-                  <input type="checkbox" className="accent-[#51A3DA]" />
-                </td>
-                <td className="px-4 py-4">{team.id}</td>
-                <td className="px-4 py-4 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#60269E] text-white flex items-center justify-center font-semibold">
-                    {team.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-medium">{team.name}</p>
-                    <p className="text-xs text-gray-400">{team.email}</p>
-                  </div>
-                </td>
-                <td className="px-4 py-4">{team.role}</td>
-                <td className="px-4 py-4">{team.date}</td>
-                <td className="px-4 py-4">
-                  <span
-                    className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                      team.status === "Active"
-                        ? "bg-[#ECFDF3] text-[#027A48]"
-                        : "bg-[#FEF6F7] text-[#E71D36]"
-                    }`}
-                  >
-                    {team.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {admins &&
+              admins.map((team, idx) => (
+                <tr key={idx} className="border-b hover:bg-gray-50">
+                  <td className="px-4 py-4">
+                    <input type="checkbox" className="accent-[#51A3DA]" />
+                  </td>
+                  <td className="px-4 py-4">{team.id}</td>
+                  <td className="px-4 py-4 flex items-center gap-3">
+                    <Avatar>
+                      <AvatarImage src={team.profilePhoto || ""} />
+                      <AvatarFallback>
+                        {team.firstName[0]}
+                        {team.lastName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">
+                        {team.firstName} {team.lastName}
+                      </p>
+                      <p className="text-xs text-gray-400">{team.email}</p>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">Admin</td>
+                  <td className="px-4 py-4">
+                    {new Date(team.createdAt).toDateString() || ""}
+                  </td>
+                  <td className="px-4 py-4">
+                    <span
+                    // className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                    //   team.status === "Active"
+                    //     ? "bg-[#ECFDF3] text-[#027A48]"
+                    //     : "bg-[#FEF6F7] text-[#E71D36]"
+                    // }`}
+                    >
+                      {""}
+                    </span>
+                  </td>
+                </tr>
+              ))}
 
-            {paginatedTeams.length === 0 && (
+            {(!admins || admins.length === 0) && (
               <tr>
                 <td colSpan={6} className="text-center py-8 text-gray-400">
                   No results found.
@@ -187,20 +122,18 @@ export default function TeamPage() {
 
       {/* Pagination */}
       <div className="flex gap-5 items-center mt-6 text-sm text-gray-600">
-        <p>
-          Page {currentPage} of {totalPages || 1}
-        </p>
+        <p>{/* Page {currentPage} of {totalPages || 1} */}</p>
 
         <div className="flex mx-auto gap-2">
           <button
-            onClick={() => handlePageChange(currentPage - 1)}
+            // onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold"
           >
             &lt;
           </button>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          {/* {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
               onClick={() => handlePageChange(page)}
@@ -212,11 +145,11 @@ export default function TeamPage() {
             >
               {page}
             </button>
-          ))}
+          ))} */}
 
           <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            // onClick={() => handlePageChange(currentPage + 1)}
+            // disabled={currentPage === totalPages}
             className="w-8 h-8 rounded-full border border-[#2390FA] flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 text-[#2390FA] text-[20px] font-bold"
           >
             &gt;

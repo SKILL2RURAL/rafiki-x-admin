@@ -8,8 +8,10 @@ export interface AnalyticsOverview {
   activeUsers: {
     total: number;
     topLocations: { country: string; count: number; percentage: number }[];
+    locations: { country: string; count: number; percentage: number }[];
   };
   ageGroupDistribution: { count: number; label: string }[];
+  genderDistribution: Record<string, number>;
   summary: {
     activeSubscriptions: number;
     newSignups: number;

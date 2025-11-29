@@ -1,7 +1,6 @@
 import { apiRequest } from "@/lib/apiHandler";
 import api from "@/lib/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -34,10 +33,12 @@ export const useInviteAdmin = () => {
         body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error("Failed to invite admin");
+        throw new Error(data.message || "Failed to invite admin");
       }
-      return res.json();
+      return data;
     },
 
     onSuccess: () => {
@@ -52,6 +53,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  profilePhoto?: string;
   // role: string;
 }
 
@@ -61,6 +63,7 @@ export const useUser = () => {
     queryKey: ["user"],
     queryFn: async () => {
       const res = await fetch("/api/auth/me");
+
       if (!res.ok) {
         throw new Error("Not authenticated");
       }

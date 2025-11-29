@@ -14,7 +14,6 @@ const MessageUserModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -34,7 +33,6 @@ const MessageUserModal = ({
         }
         return;
       }
-      setImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);

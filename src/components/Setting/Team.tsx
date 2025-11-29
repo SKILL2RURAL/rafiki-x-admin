@@ -6,18 +6,9 @@ import { useAdmins } from "@/hook/useAdmin";
 import download from "@/lib/assets/icons/download.png";
 import searchIcon from "@/lib/assets/icons/search.png";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { InviteModal } from "./InviteModal";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-
-type Teams = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  date: string;
-  status: "Active" | "Deactive";
-}[];
 
 export default function TeamPage() {
   const { data: admins } = useAdmins();

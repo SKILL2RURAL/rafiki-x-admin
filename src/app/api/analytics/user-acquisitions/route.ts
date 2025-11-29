@@ -40,6 +40,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(data.data, { status: 200 });
   } catch (error) {
+    console.error("Error fetching user acquisitions:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

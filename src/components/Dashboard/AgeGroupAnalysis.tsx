@@ -11,22 +11,22 @@ import {
 } from "recharts";
 
 interface CustomLabelProps {
-  x?: string | number;
-  y?: string | number;
-  width?: string | number;
-  value?: string | number;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number;
+  index?: number;
+  [key: string]: any; // Allows any other props that Recharts might pass
 }
 
 const CustomLabel = (props: CustomLabelProps) => {
   const { x = 0, y = 0, width = 0, value = 0 } = props;
-  const xNum = typeof x === "string" ? parseFloat(x) : x;
-  const yNum = typeof y === "string" ? parseFloat(y) : y;
-  const widthNum = typeof width === "string" ? parseFloat(width) : width;
 
   return (
     <text
-      x={xNum + widthNum + 10}
-      y={yNum + 18}
+      x={x + width + 10}
+      y={y + 18}
       fill="#1f2937"
       fontSize={16}
       fontWeight={400}
@@ -100,7 +100,7 @@ export default function AgeGroupAnalysis() {
                     fill={COLORS[index % COLORS.length]}
                   />
                 ))}
-                <LabelList dataKey="count" content={CustomLabel as any} />
+                <LabelList dataKey="count" content={CustomLabel} />
                 {/* <LabelList dataKey="count" /> */}
               </Bar>
             </BarChart>

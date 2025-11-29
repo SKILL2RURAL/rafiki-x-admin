@@ -5,7 +5,7 @@ import { Bell } from "lucide-react";
 import { useUser } from "@/hook/useAuth";
 
 const Navbar = () => {
-  const { data: user, isLoading } = useUser();
+  const { data: user } = useUser();
   const userInitials =
     user?.firstName && user?.lastName
       ? `${user.firstName[0]}${user.lastName[0]}`

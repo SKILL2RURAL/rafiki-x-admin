@@ -44,6 +44,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(responseData, { status: 201 });
   } catch (error) {
+    console.error("Invite API route error:", error);
     return NextResponse.json(
       { message: "An internal server error occurred." },
       { status: 500 }

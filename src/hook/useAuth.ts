@@ -1,7 +1,6 @@
 import { apiRequest } from "@/lib/apiHandler";
 import api from "@/lib/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 
 export const useLogin = () => {
   const queryClient = useQueryClient();

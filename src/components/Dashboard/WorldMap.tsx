@@ -30,6 +30,12 @@ interface GeographiesChildProps {
   geographies: GeoFeature[];
 }
 
+interface Location {
+  name: string;
+  coordinates: [number, number];
+  users: number;
+}
+
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const countryCoordinates: { [key: string]: [number, number] } = {
@@ -54,20 +60,22 @@ const countryCoordinates: { [key: string]: [number, number] } = {
 export default function WorldMap() {
   const { data } = useAnalyticsOverview();
 
-  const locations =
+  const locations: Location[] =
     data?.activeUsers?.topLocations
-      .map((location) => {
-        const coordinates = countryCoordinates[location.country];
-        if (!coordinates) {
-          return null;
+      .map(
+        (location): Location | null => {
+          const coordinates = countryCoordinates[location.country];
+          if (!coordinates) {
+            return null;
+          }
+          return {
+            name: location.country,
+            coordinates,
+            users: location.percentage,
+          };
         }
-        return {
-          name: location.country,
-          coordinates,
-          users: location.percentage,
-        };
-      })
-      .filter(Boolean) || [];
+      )
+      .filter((location): location is Location => Boolean(location)) || [];
 
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
   const [mousePosition, setMousePosition] = useState<{

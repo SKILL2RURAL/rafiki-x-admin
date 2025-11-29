@@ -1,5 +1,5 @@
 import { useAnalyticsOverview } from "@/hook/useAnalytics";
-import React from "react";
+import React, { SVGProps } from "react";
 import {
   BarChart,
   Bar,
@@ -10,18 +10,17 @@ import {
   LabelList,
 } from "recharts";
 
-interface CustomLabelProps {
+interface CustomLabelProps extends SVGProps<SVGTextElement> {
   x?: number;
   y?: number;
   width?: number;
   height?: number;
   value?: number;
   index?: number;
-  [key: string]: any; // Allows any other props that Recharts might pass
 }
 
 const CustomLabel = (props: CustomLabelProps) => {
-  const { x = 0, y = 0, width = 0, value = 0 } = props;
+  const { x = 0, y = 0, width = 0, value = 0, ...rest } = props;
 
   return (
     <text
@@ -30,6 +29,7 @@ const CustomLabel = (props: CustomLabelProps) => {
       fill="#1f2937"
       fontSize={16}
       fontWeight={400}
+      {...rest}
     >
       {value} {value === 1 ? "user" : "users"}
     </text>

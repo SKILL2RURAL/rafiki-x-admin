@@ -1,77 +1,99 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/apiHandler";
+import api from "@/lib/axios";
+import { toast } from "sonner";
 
 // -----------------------------
 // TYPES
 // -----------------------------
 export interface AdminUser {
-  id: string;
+  id: number;
   fullName: string;
   email: string;
   joinedDate: string;
   status: "active" | "deactivated";
-  avatarUrl?: string;
+  avatarUrl: string | null;
 }
 
-export interface BillingItem {
-  id: string;
-  paymentDate: string;
-  plan: string;
+export interface AdminUserDetail {
+  id: number;
+  fullName: string;
+  email: string;
+  createdAt: string;
+  avatarUrl: string | null;
+}
+
+export interface BillingRecord {
+  id: number;
+  userId: number;
   amount: number;
-  status: string;
+  status: "paid" | "pending" | "failed";
+  createdAt: string;
 }
 
-// -----------------------------
 // FETCH ALL USERS
-// -----------------------------
 export const useAdminUsers = () => {
-  return useQuery({
+  return useQuery<AdminUser[]>({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/users");
+      const res: any = await apiRequest(() => api.get("/admin/users"));
+      
+      // The response structure is { success, message, data: [...] }
+      const users = res?.data ?? [];
 
-      if (!res.ok) throw new Error("Failed to fetch users");
-      const data = await res.json();
-
-      return data.data as AdminUser[];
+      return users.map((u: any) => ({
+        id: u.id,
+        fullName: `${u.firstName} ${u.lastName}`,
+        email: u.email,
+        joinedDate: u.createdAt,
+        status: u.status === "ACTIVE" ? "active" : "deactivated",
+        avatarUrl: u.profilePhoto,
+      }));
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
-// -----------------------------
 // FETCH USER BY ID
-// -----------------------------
-export const useAdminUserById = (userId: string) => {
-  return useQuery({
-    queryKey: ["admin-user", userId],
+export const useAdminUser = (id: string | number) => {
+  return useQuery<AdminUserDetail>({
+    queryKey: ["admin-user", id],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/users/${userId}`);
+      const res: any = await apiRequest(() => api.get(`/admin/users/${id}`));
+      
+      // The response structure is { success, message, data: {...} }
+      const u = res?.data;
 
-      if (!res.ok) throw new Error("Failed to fetch user");
-      const data = await res.json();
-
-      return data.data as AdminUser;
+      return {
+        id: u.id,
+        fullName: `${u.firstName} ${u.lastName}`,
+        email: u.email,
+        createdAt: u.createdAt,
+        avatarUrl: u.profilePhoto,
+      };
     },
-    enabled: !!userId,
+    enabled: Boolean(id),
   });
 };
 
-// -----------------------------
-// FETCH BILLINGS BY USER
-// -----------------------------
-export const useUserBillings = (userId: string) => {
-  return useQuery({
-    queryKey: ["user-billings", userId],
+// FETCH BILLINGS
+export const useBilling = () => {
+  return useQuery<BillingRecord[]>({
+    queryKey: ["billing"],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/users/${userId}/billings`);
-
-      if (!res.ok) throw new Error("Failed to fetch billings");
-      const data = await res.json();
-
-      return data.data as BillingItem[];
+      const res: any = await apiRequest(() => api.get("/billing"));
+      const rows = res?.data ?? [];
+      
+      return rows.map((b: any) => ({
+        id: b.id,
+        userId: b.userId,
+        amount: b.amount,
+        status: b.status,
+        createdAt: b.createdAt,
+      }));
     },
-    enabled: !!userId,
   });
 };
 
@@ -82,17 +104,17 @@ export const useDeactivateUser = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (userId: string) => {
-      const res = await fetch(`/api/admin/users/${userId}/deactivate`, {
-        method: "PATCH",
-      });
-
-      if (!res.ok) throw new Error("Failed to deactivate user");
-      return res.json();
+    mutationFn: async (userId: number) => {
+      return await apiRequest(() => api.patch(`/admin/users/${userId}/deactivate`));
     },
     onSuccess: () => {
+      toast.success("User deactivated successfully");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       qc.invalidateQueries({ queryKey: ["admin-user"] });
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || "Failed to deactivate user";
+      toast.error(errorMessage);
     },
   });
 };
@@ -104,17 +126,17 @@ export const useActivateUser = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (userId: string) => {
-      const res = await fetch(`/api/admin/users/${userId}/activate`, {
-        method: "PATCH",
-      });
-
-      if (!res.ok) throw new Error("Failed to activate user");
-      return res.json();
+    mutationFn: async (userId: number) => {
+      return await apiRequest(() => api.patch(`/admin/users/${userId}/activate`));
     },
     onSuccess: () => {
+      toast.success("User activated successfully");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
       qc.invalidateQueries({ queryKey: ["admin-user"] });
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || "Failed to activate user";
+      toast.error(errorMessage);
     },
   });
 };
@@ -125,14 +147,14 @@ export const useActivateUser = () => {
 export const useSendMessage = () => {
   return useMutation({
     mutationFn: async (payload: { userId: string; message: string }) => {
-      const res = await fetch(`/api/admin/users/message`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error("Failed to send message");
-      return res.json();
+      return await apiRequest(() => api.post(`/admin/users/message`, payload));
+    },
+    onSuccess: () => {
+      toast.success("Message sent successfully");
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || "Failed to send message";
+      toast.error(errorMessage);
     },
   });
 };
@@ -144,14 +166,9 @@ export const useUserAcquisition = (period: "month" | "year") => {
   return useQuery({
     queryKey: ["user-acquisition", period],
     queryFn: async () => {
-      const res = await fetch(
-        `/api/admin/analytics/user-acquisition?period=${period}`
+      return await apiRequest(() =>
+        api.get(`/admin/analytics/user-acquisition?period=${period}`)
       );
-
-      if (!res.ok) throw new Error("Failed to fetch analytics");
-      const data = await res.json();
-
-      return data.data;
     },
   });
 };

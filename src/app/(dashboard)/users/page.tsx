@@ -1,6 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useActivateUser , useDeactivateUser, useAdminUsers } from "@/hook/useUser";
+import { useActivateUser, useDeactivateUser, useAdminUsers } from "@/hook/useUser";
 
 import {
   Table,
@@ -17,63 +17,49 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 const UsersPage = () => {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = React.useState("");
   const [active, setActive] = React.useState("All");
-  const { data: users, isLoading } = useAdminUsers();
+  
+  // FIXED: All hooks must be at the top, before any conditional returns
+  const { data, isLoading, isError, error } = useAdminUsers();
   const activateUser = useActivateUser();
   const deactivateUser = useDeactivateUser();
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <p className="text-sm text-muted-foreground">Loading users...</p>
+      </div>
+    );
+  }
 
-  const tableData = [
-    {
-      id: "001",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "002",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "003",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "004",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "005",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "006",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-  ];
+  // Error state
+  if (isError) {
+    return (
+      <div className="p-6">
+        <p className="text-red-500 text-sm">
+          Failed to load users. {String(error)}
+        </p>
+      </div>
+    );
+  }
+
+  // Filter by name or email
+  const filteredUsers =
+    data?.filter((user) => {
+      const q = searchQuery.toLowerCase();
+      return (
+        user.fullName.toLowerCase().includes(q) ||
+        user.email.toLowerCase().includes(q)
+      );
+    }) ?? [];
 
   return (
     <div>
@@ -86,15 +72,19 @@ const UsersPage = () => {
       <div className="grid grid-cols-3 gap-5">
         <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
           <p className="text-[14px] text-[#A3AED0]">Total Users</p>
-          <p className="text-[36px] font-bold text-primary">0</p>
+          <p className="text-[36px] font-bold text-primary">{data?.length ?? 0}</p>
         </div>
         <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
           <p className="text-[14px] text-[#A3AED0]">Active Users</p>
-          <p className="text-[36px] font-bold text-primary">0</p>
+          <p className="text-[36px] font-bold text-primary">
+            {data?.filter(u => u.status === "active").length ?? 0}
+          </p>
         </div>
         <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
           <p className="text-[14px] text-[#A3AED0]">Deactivated Users</p>
-          <p className="text-[36px] font-bold text-primary">0</p>
+          <p className="text-[36px] font-bold text-primary">
+            {data?.filter(u => u.status === "deactivated").length ?? 0}
+          </p>
         </div>
       </div>
 
@@ -135,7 +125,7 @@ const UsersPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(users ?? []).map((item) => (
+            {(filteredUsers ?? []).map((item) => (
               <TableRow
                 key={item.id}
                 className="h-[70px] text-[14px] cursor-pointer hover:bg-[#F9FAFB]"
@@ -148,18 +138,22 @@ const UsersPage = () => {
                   <div className="flex items-center gap-2">
                     <Avatar>
                       <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
+                        src={item.avatarUrl ?? "https://github.com/shadcn.png"}
+                        alt={item.fullName}
                       />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarFallback>{item.fullName.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <p>{item.fullName}</p>
                   </div>
                 </TableCell>
                 <TableCell className="text-[14px]">{item.email}</TableCell>
-                <TableCell>{item.joinedDate}</TableCell>
+                <TableCell>{new Date(item.joinedDate).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <p className="bg-[#ECFDF3] text-[#027A48] rounded-[16px] px-3 py-1 w-fit">
+                  <p className={`${
+                    item.status === "active" 
+                      ? "bg-[#ECFDF3] text-[#027A48]" 
+                      : "bg-[#FEF3F2] text-[#B42318]"
+                  } rounded-[16px] px-3 py-1 w-fit capitalize`}>
                     {item.status}
                   </p>
                 </TableCell>
@@ -173,14 +167,22 @@ const UsersPage = () => {
                         <EllipsisVertical />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="p-3">
-                        <DropdownMenuItem className="text-[#313131] font-bold mb-3"
-                        onClick={() => activateUser.mutate(item.id)}
+                        <DropdownMenuItem 
+                          className="text-[#313131] font-bold mb-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            activateUser.mutate(item.id);
+                          }}
                         >
                           Activate User
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-[#313131] font-bold my-3"
-                        onClick={() => deactivateUser.mutate(item.id)}
+                        <DropdownMenuItem 
+                          className="text-[#313131] font-bold my-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deactivateUser.mutate(item.id);
+                          }}
                         >
                           Deactivate User
                         </DropdownMenuItem>

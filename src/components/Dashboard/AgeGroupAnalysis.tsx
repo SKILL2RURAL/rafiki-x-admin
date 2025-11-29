@@ -11,27 +11,32 @@ import {
 } from "recharts";
 
 interface CustomLabelProps extends SVGProps<SVGTextElement> {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  value?: number;
+  x?: string | number;
+  y?: string | number;
+  width?: string | number;
+  height?: string | number;
+  value?: string | number;
   index?: number;
 }
 
 const CustomLabel = (props: CustomLabelProps) => {
-  const { x = 0, y = 0, width = 0, value = 0, ...rest } = props;
+  const { x, y, width, value, ...rest } = props;
+
+  const xNum = Number(x || 0);
+  const yNum = Number(y || 0);
+  const widthNum = Number(width || 0);
+  const valueNum = Number(value || 0);
 
   return (
     <text
-      x={x + width + 10}
-      y={y + 18}
+      x={xNum + widthNum + 10}
+      y={yNum + 18}
       fill="#1f2937"
       fontSize={16}
       fontWeight={400}
       {...rest}
     >
-      {value} {value === 1 ? "user" : "users"}
+      {valueNum} {valueNum === 1 ? "user" : "users"}
     </text>
   );
 };

@@ -19,9 +19,8 @@ const MessageUserModal = ({
   onClose: () => void;
   userId: string;
 }) => {
-  const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
-
+  const [title, setTitle] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);

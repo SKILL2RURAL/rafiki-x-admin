@@ -1,5 +1,5 @@
 import { useAnalyticsOverview } from "@/hook/useAnalytics";
-import React from "react";
+import React, { SVGProps } from "react";
 import {
   BarChart,
   Bar,
@@ -10,26 +10,22 @@ import {
   LabelList,
 } from "recharts";
 
-const data = [
-  { ageGroup: "12-15 years", users: 505, color: "#7c3aed" },
-  { ageGroup: "16-21 years", users: 100, color: "#3b82f6" },
-  { ageGroup: "22-26 years", users: 100, color: "#a78bfa" },
-  { ageGroup: "27-35 years", users: 50, color: "#06b6d4" },
-  { ageGroup: "36 above", users: 14, color: "#16a34a" },
-];
-
-interface CustomLabelProps {
+interface CustomLabelProps extends SVGProps<SVGTextElement> {
   x?: string | number;
   y?: string | number;
   width?: string | number;
-  value?: string | number;
+  height?: string | number;
+  value?: string | number | null;
+  index?: number;
 }
 
 const CustomLabel = (props: CustomLabelProps) => {
-  const { x = 0, y = 0, width = 0, value = 0 } = props;
-  const xNum = typeof x === "string" ? parseFloat(x) : x;
-  const yNum = typeof y === "string" ? parseFloat(y) : y;
-  const widthNum = typeof width === "string" ? parseFloat(width) : width;
+  const { x, y, width, value, ...rest } = props;
+
+  const xNum = Number(x || 0);
+  const yNum = Number(y || 0);
+  const widthNum = Number(width || 0);
+  const valueNum = Number(value || 0);
 
   return (
     <text
@@ -38,8 +34,8 @@ const CustomLabel = (props: CustomLabelProps) => {
       fill="#1f2937"
       fontSize={16}
       fontWeight={400}
-    >
-      {value} {value === 1 ? "user" : "users"}
+      {...rest}>
+      {valueNum} {valueNum === 1 ? "user" : "users"}
     </text>
   );
 };
@@ -47,6 +43,15 @@ const CustomLabel = (props: CustomLabelProps) => {
 export default function AgeGroupAnalysis() {
   const { data, isLoading } = useAnalyticsOverview();
   const ageGroups = data?.ageGroupDistribution || [];
+
+  const COLORS = [
+    "#60269E",
+    "#51A3DA",
+    "#A080F9",
+    "#FF8042",
+    "#8884d8",
+    "#82ca9d",
+  ];
 
   if (isLoading) {
     return <div>Loading data</div>;
@@ -74,8 +79,7 @@ export default function AgeGroupAnalysis() {
             <BarChart
               data={ageGroups}
               layout="vertical"
-              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-            >
+              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
               <XAxis
                 type="number"
                 axisLine={false}
@@ -94,9 +98,12 @@ export default function AgeGroupAnalysis() {
               />
               <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={32}>
                 {ageGroups.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill="blue" />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
-                <LabelList dataKey="count" content={CustomLabel as any} />
+                {/* <LabelList dataKey="count" content={CustomLabel as CustomLabelProps} /> */}
                 {/* <LabelList dataKey="count" /> */}
               </Bar>
             </BarChart>

@@ -3,6 +3,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useActivateUser, useDeactivateUser, useAdminUsers } from "@/hook/useUser";
 
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -13,13 +20,6 @@ import {
 import { EllipsisVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const UsersPage = () => {
   const router = useRouter();

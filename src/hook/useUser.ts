@@ -23,25 +23,20 @@ export interface AdminUserDetail {
   email: string;
   createdAt: string;
   avatarUrl: string | null;
+  status?: string;
 }
 
-export interface BillingRecord {
-  id: number;
-  userId: number;
-  amount: number;
-  status: "paid" | "pending" | "failed";
-  createdAt: string;
-}
 
 // FETCH ALL USERS
 export const useAdminUsers = () => {
   return useQuery<AdminUser[]>({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const res: any = await apiRequest(() => api.get("/admin/users"));
+      // apiRequest returns the response body: { success, message, data }
+      const response: any = await apiRequest(() => api.get("/admin/users"));
       
-      // The response structure is { success, message, data: [...] }
-      const users = res?.data ?? [];
+      // Extract the users array from response.data
+      const users = response?.data ?? [];
 
       return users.map((u: any) => ({
         id: u.id,
@@ -61,10 +56,14 @@ export const useAdminUser = (id: string | number) => {
   return useQuery<AdminUserDetail>({
     queryKey: ["admin-user", id],
     queryFn: async () => {
-      const res: any = await apiRequest(() => api.get(`/admin/users/${id}`));
+      const response: any = await apiRequest(() => api.get(`/admin/users/${id}`));
       
-      // The response structure is { success, message, data: {...} }
-      const u = res?.data;
+      // Extract the user object from response.data
+      const u = response?.data;
+
+      if (!u) {
+        throw new Error("User not found");
+      }
 
       return {
         id: u.id,
@@ -75,25 +74,6 @@ export const useAdminUser = (id: string | number) => {
       };
     },
     enabled: Boolean(id),
-  });
-};
-
-// FETCH BILLINGS
-export const useBilling = () => {
-  return useQuery<BillingRecord[]>({
-    queryKey: ["billing"],
-    queryFn: async () => {
-      const res: any = await apiRequest(() => api.get("/billing"));
-      const rows = res?.data ?? [];
-      
-      return rows.map((b: any) => ({
-        id: b.id,
-        userId: b.userId,
-        amount: b.amount,
-        status: b.status,
-        createdAt: b.createdAt,
-      }));
-    },
   });
 };
 

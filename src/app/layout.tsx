@@ -68,7 +68,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.className} ${geistMono.className} ${mullish.className} ${jakartaSans.className} ${satoshi.className} antialiased`}>
+        className={`${geistSans.className} ${geistMono.className} ${mullish.className} ${jakartaSans.className} ${satoshi.className} antialiased`}
+      >
         <Wrapper>{children}</Wrapper>
         <Toaster richColors position="top-right" duration={3000} />
       </body>

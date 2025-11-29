@@ -4,21 +4,21 @@ import AgeGroupAnalysis from "@/components/Dashboard/AgeGroupAnalysis";
 import GenderBubbleChart from "@/components/Dashboard/GenderBubbleCart";
 import UserAcquisitions from "@/components/Dashboard/UserAcquisitions";
 import WorldMap from "@/components/Dashboard/WorldMap";
+import { Spinner } from "@/components/ui/spinner";
 import { useAnalyticsOverview } from "@/hook/useAnalytics";
-import React from "react";
+import { useState } from "react";
 
 const AnalyticsPage = () => {
-  const [active, setActive] = React.useState("Users");
-  const { data: analyticsOverview } = useAnalyticsOverview();
-  console.log(analyticsOverview);
+  const [active, setActive] = useState("Users");
+  const { data: analyticsOverview, isLoading } = useAnalyticsOverview();
 
-  const locations = [
-    { name: "Lagos, Nigeria", percent: 50 },
-    { name: "USA", percent: 30 },
-    { name: "England", percent: 20 },
-    { name: "Ghana", percent: 10 },
-    { name: "Germany", percent: 10 },
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex h-[80vh] w-full items-center justify-center">
+        <Spinner className="size-8" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -74,12 +74,11 @@ const AnalyticsPage = () => {
       </div>
       <div className="h-10" />
 
+      {/* USER ACQUISITION  */}
       <UserAcquisitions />
-
       <div className="grid grid-cols-2 gap-5 mt-10">
         {/* Users  */}
-        <GenderBubbleChart data={{ male: 320, female: 180 }} />
-
+        <GenderBubbleChart data={analyticsOverview?.genderDistribution} />
         {/* Age Group  */}
         <AgeGroupAnalysis />
       </div>

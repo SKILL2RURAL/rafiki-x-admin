@@ -10,14 +10,6 @@ import {
   LabelList,
 } from "recharts";
 
-const data = [
-  { ageGroup: "12-15 years", users: 505, color: "#7c3aed" },
-  { ageGroup: "16-21 years", users: 100, color: "#3b82f6" },
-  { ageGroup: "22-26 years", users: 100, color: "#a78bfa" },
-  { ageGroup: "27-35 years", users: 50, color: "#06b6d4" },
-  { ageGroup: "36 above", users: 14, color: "#16a34a" },
-];
-
 interface CustomLabelProps {
   x?: string | number;
   y?: string | number;
@@ -47,6 +39,15 @@ const CustomLabel = (props: CustomLabelProps) => {
 export default function AgeGroupAnalysis() {
   const { data, isLoading } = useAnalyticsOverview();
   const ageGroups = data?.ageGroupDistribution || [];
+
+  const COLORS = [
+    "#60269E",
+    "#51A3DA",
+    "#A080F9",
+    "#FF8042",
+    "#8884d8",
+    "#82ca9d",
+  ];
 
   if (isLoading) {
     return <div>Loading data</div>;
@@ -94,7 +95,10 @@ export default function AgeGroupAnalysis() {
               />
               <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={32}>
                 {ageGroups.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill="blue" />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
                 <LabelList dataKey="count" content={CustomLabel as any} />
                 {/* <LabelList dataKey="count" /> */}

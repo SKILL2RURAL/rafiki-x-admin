@@ -8,8 +8,6 @@ export async function GET() {
 
   if (!token) {
     return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-
-    console.log(token);
   }
 
   try {
@@ -25,8 +23,9 @@ export async function GET() {
         { status: 500 }
       );
     }
+    const { data } = await res.json();
 
-    return NextResponse.json({ message: "Fetched admins" }, { status: 200 });
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.log("Error fetching admins", error);
     return NextResponse.json(

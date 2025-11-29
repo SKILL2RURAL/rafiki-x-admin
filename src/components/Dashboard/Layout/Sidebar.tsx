@@ -1,16 +1,17 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUser } from "@/hook/useAuth";
 import { LogOut, MessageCircle, Settings, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React from "react";
 
 const Sidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const iconSize = "20px"; // Icon Size
+  const { data: user } = useUser();
 
   // Navbar Links
   const link = [
@@ -38,11 +39,16 @@ const Sidebar = () => {
     router.refresh();
   }
 
+  const userInitials =
+    user?.firstName && user?.lastName
+      ? `${user.firstName[0]}${user.lastName[0]}`
+      : "CN";
+
   return (
     <div className="w-[var(--sidebar-width)] bg-[#FCFCFC] flex flex-col px-5 justify-between">
       <div>
         {/* Logo  */}
-        <div className="flex gap-3 items-center h-[var(--navbar-height)]">
+        <div className="flex gap-3 items-center h-[var(--navbar-height)] mt-8">
           <Image
             src={"/icons/logo-gradient.svg"}
             alt="Rafiki X"
@@ -86,12 +92,14 @@ const Sidebar = () => {
       <div className="flex gap-2 justify-between mb-10 items-center">
         <div className="flex gap-2 items-center">
           <Avatar className="size-10">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={user?.profilePhoto || ""} />
+            <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
           <div className="space-y-1">
-            <p className="text-sm font-semibold leading-none">Sunrise truck</p>
-            <p className="text-sm leading-none">bola@truckie.com</p>
+            <p className="text-sm font-semibold leading-none">
+              {user?.firstName} {user?.lastName}
+            </p>
+            <p className="text-sm leading-none">{user?.email}</p>
           </div>
         </div>
         <button onClick={logout}>

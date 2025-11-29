@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  // 1. Get the token from the httpOnly cookie to authenticate the user sending the invite
   const cookieStore = cookies();
   const token = (await cookieStore).get("auth_token")?.value;
 
@@ -14,7 +13,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // 2. Get the email to invite from the request body
   const body = await request.json();
   const { email, firstName, lastName } = body;
 
@@ -26,7 +24,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    // 3. Forward the request to your actual backend, adding the sender's token for authorization.
     const inviteResponse = await fetch(`${BACKEND_API_URL}/api/admin/invite`, {
       method: "POST",
       headers: {
@@ -36,7 +33,6 @@ export async function POST(request: Request) {
       body: JSON.stringify({ email, firstName, lastName }),
     });
 
-    // 4. Proxy the response from the backend to the client.
     const responseData = await inviteResponse.json();
 
     if (!inviteResponse.ok) {
@@ -48,7 +44,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(responseData, { status: 201 });
   } catch (error) {
-    console.error("Invite User API route error:", error);
     return NextResponse.json(
       { message: "An internal server error occurred." },
       { status: 500 }

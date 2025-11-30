@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
-import { useSendMessage } from "@/hook/useUser";
+import { useSendMessage, useAdminUser } from "@/hook/useUser";
 
 const MessageUserModal = ({
   isOpen,
@@ -26,28 +26,73 @@ const MessageUserModal = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sendMessage = useSendMessage();
+  // Fetch user data to get the email
+  const { data: user } = useAdminUser(userId);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    sendMessage.mutate(
-      {
-        userId,
-        message,
+    if (!user?.email) {
+      alert("User email not found");
+      return;
+    }
+
+    // Convert image to base64 if present
+    let base64Data = null;
+    let filename = null;
+    let contentType = null;
+
+    if (image) {
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          // Remove the data URL prefix (e.g., "data:image/png;base64,")
+          const base64 = result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+      });
+      
+      reader.readAsDataURL(image);
+      base64Data = await base64Promise;
+      filename = image.name;
+      contentType = image.type;
+    }
+
+    // Build payload matching backend API structure
+    const payload: any = {
+      email: user.email, // Use the actual user email
+      title,
+      message,
+    };
+
+    // Add attachments array if image exists
+    if (base64Data && filename && contentType) {
+      payload.attachments = [
+        {
+          filename,
+          contentType,
+          base64Data,
+        },
+      ];
+    }
+
+    console.log("Sending payload:", { ...payload, attachments: payload.attachments ? `[${payload.attachments.length} file(s)]` : undefined });
+
+    sendMessage.mutate(payload, {
+      onSuccess: () => {
+        setTitle("");
+        setMessage("");
+        setImage(null);
+        setImagePreview(null);
+        onClose();
       },
-      {
-        onSuccess: () => {
-          setTitle("");
-          setMessage("");
-          setImage(null);
-          setImagePreview(null);
-          onClose();
-        },
-        onError: () => {
-          alert("Failed to send message");
-        },
-      }
-    );
+      onError: (error: any) => {
+        console.error("Send message error:", error);
+        alert("Failed to send message: " + (error?.response?.data?.message || "Unknown error"));
+      },
+    });
   };
 
   const handleImageContainerClick = () => {
@@ -101,7 +146,7 @@ const MessageUserModal = ({
 
           {/* Image */}
           <div>
-            <label className="font-[500] text-[16px]">Image</label>
+            <label className="font-[500] text-[16px]">Image (Optional)</label>
             <input
               type="file"
               ref={fileInputRef}
@@ -142,8 +187,8 @@ const MessageUserModal = ({
 
           <button
             type="submit"
-            disabled={sendMessage.isPending}
-            className="font-bold text-[14px] bg-gradient-to-r from-[#51A3DA] to-[#60269E] py-3 px-4 rounded-[10px] text-white w-full"
+            disabled={sendMessage.isPending || !user?.email}
+            className="font-bold text-[14px] bg-gradient-to-r from-[#51A3DA] to-[#60269E] py-3 px-4 rounded-[10px] text-white w-full disabled:opacity-50"
           >
             {sendMessage.isPending ? "Sending..." : "Send Message"}
           </button>

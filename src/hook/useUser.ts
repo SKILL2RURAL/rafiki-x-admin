@@ -27,6 +27,17 @@ export interface AdminUserDetail {
 }
 
 
+export interface SendMessagePayload {
+  email: string;
+  title: string;
+  message: string;
+  attachments?: Array<{
+    filename: string;
+    contentType: string;
+    base64Data: string;
+  }>;
+}
+
 // FETCH ALL USERS
 export const useAdminUsers = () => {
   return useQuery<AdminUser[]>({
@@ -126,7 +137,7 @@ export const useActivateUser = () => {
 // -----------------------------
 export const useSendMessage = () => {
   return useMutation({
-    mutationFn: async (payload: { userId: string; message: string }) => {
+    mutationFn: async (payload: SendMessagePayload) => {
       return await apiRequest(() => api.post(`/admin/users/message`, payload));
     },
     onSuccess: () => {
@@ -138,7 +149,6 @@ export const useSendMessage = () => {
     },
   });
 };
-
 // -----------------------------
 // USER ACQUISITION ANALYTICS
 // -----------------------------

@@ -62,20 +62,19 @@ export default function WorldMap() {
 
   const locations: Location[] =
     data?.activeUsers?.topLocations
-      .map(
-        (location): Location | null => {
-          const coordinates = countryCoordinates[location.country];
-          if (!coordinates) {
-            return null;
-          }
-          return {
-            name: location.country,
-            coordinates,
-            users: location.percentage,
-          };
+      .map((location): Location | null => {
+        const coordinates = countryCoordinates[location.country];
+        if (!coordinates) {
+          return null;
         }
-      )
+        return {
+          name: location.country,
+          coordinates,
+          users: location.percentage,
+        };
+      })
       .filter((location): location is Location => Boolean(location)) || [];
+  console.log(locations);
 
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
   const [mousePosition, setMousePosition] = useState<{

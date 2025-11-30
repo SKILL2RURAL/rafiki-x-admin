@@ -86,9 +86,9 @@ const AnalyticsPage = () => {
       <div className="border border-[#EAECF0] rounded-[20px] p-5 mt-10">
         <div className="border-b pb-5 flex items-center justify-between">
           <p className="text-[16px] font-medium">Active Users</p>
-          <button className="px-3 py-2 border border-[#D0D5DD] shadow-sm rounded-[8px]">
+          <div className="px-3 py-2 border border-[#D0D5DD] shadow-sm rounded-[8px]">
             Real-time report
-          </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-10 my-5">
@@ -113,7 +113,7 @@ const AnalyticsPage = () => {
                   analyticsOverview.activeUsers.topLocations.map(
                     (item, index) => (
                       <div key={index}>
-                        <p className="text-[12px] font-[500] mb-2">
+                        <p className="text-[13px] font-medium mb-2">
                           {item.country}
                         </p>
                         <div className="flex gap-3">
@@ -123,8 +123,8 @@ const AnalyticsPage = () => {
                               style={{ width: `${item.percentage}%` }}
                             />
                           </div>
-                          <p className="text-[10px] text-[#344054]">
-                            {item.percentage.toFixed(1)}%
+                          <p className="text-[14px] text-[#344054]">
+                            {item.percentage.toLocaleString()}%
                           </p>
                         </div>
                       </div>

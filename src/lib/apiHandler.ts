@@ -1,17 +1,17 @@
-import axios from "axios";
+import { AxiosResponse } from "axios";
 
-export async function apiRequest<T>(
-  callback: () => Promise<{ data: T }>
-): Promise<T> {
+export const apiRequest = async <T = any>(
+  request: () => Promise<AxiosResponse<T>>
+): Promise<T> => {
   try {
-    const response = await callback();
+    const response = await request();
+    // Return just the data, not the entire AxiosResponse
     return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const message =
-        error.response?.data.message || "Something went wrong, try again later";
-      throw new Error(message);
-    }
+  } catch (error: any) {
+    // Log the error for debugging
+    console.error("API Request Error:", error);
+    
+    // Re-throw the original error so React Query and Axios interceptors can handle it
     throw error;
   }
-}
+};

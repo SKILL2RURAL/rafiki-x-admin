@@ -1,5 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useActivateUser, useDeactivateUser, useAdminUsers } from "@/hook/useUser";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,52 +23,76 @@ import React from "react";
 
 const UsersPage = () => {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = React.useState("");
   const [active, setActive] = React.useState("All");
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const ITEMS_PER_PAGE = 10;
+  
+  // All hooks must be at the top, before any conditional returns
+  const { data, isLoading, isError, error } = useAdminUsers();
+  const activateUser = useActivateUser();
+  const deactivateUser = useDeactivateUser();
 
-  const tableData = [
-    {
-      id: "001",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "002",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "003",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "004",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "005",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-    {
-      id: "006",
-      name: "John Doe",
-      email: "johndoe@gmail.com",
-      joinedDate: "Sept, 10, 2023",
-      status: "Deactived",
-    },
-  ];
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <p className="text-sm text-muted-foreground">Loading users...</p>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="p-6">
+        <p className="text-red-500 text-sm">
+          Failed to load users. {String(error)}
+        </p>
+      </div>
+    );
+  }
+
+  // Filter by name or email
+  let filteredUsers = data?.filter((user) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      user.fullName.toLowerCase().includes(q) ||
+      user.email.toLowerCase().includes(q)
+    );
+  }) ?? [];
+
+  // Filter by status
+  if (active === "Active") {
+    filteredUsers = filteredUsers.filter(user => user.status === "active");
+  } else if (active === "Deactivated") {
+    filteredUsers = filteredUsers.filter(user => user.status === "deactivated");
+  }
+  // "All" shows everything
+
+  // Pagination calculations
+  const totalItems = filteredUsers.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [active, searchQuery]);
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   return (
     <div>
@@ -79,15 +105,19 @@ const UsersPage = () => {
       <div className="grid grid-cols-3 gap-5">
         <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
           <p className="text-[14px] text-[#A3AED0]">Total Users</p>
-          <p className="text-[36px] font-bold text-primary">0</p>
+          <p className="text-[36px] font-bold text-primary">{data?.length ?? 0}</p>
         </div>
         <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
           <p className="text-[14px] text-[#A3AED0]">Active Users</p>
-          <p className="text-[36px] font-bold text-primary">0</p>
+          <p className="text-[36px] font-bold text-primary">
+            {data?.filter(u => u.status === "active").length ?? 0}
+          </p>
         </div>
         <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
           <p className="text-[14px] text-[#A3AED0]">Deactivated Users</p>
-          <p className="text-[36px] font-bold text-primary">0</p>
+          <p className="text-[36px] font-bold text-primary">
+            {data?.filter(u => u.status === "deactivated").length ?? 0}
+          </p>
         </div>
       </div>
 
@@ -128,70 +158,104 @@ const UsersPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tableData.map((item) => (
-              <TableRow
-                key={item.id}
-                className="h-[70px] text-[14px] cursor-pointer hover:bg-[#F9FAFB]"
-                onClick={() => router.push(`/users/${item.id}`)}
-              >
-                <TableCell>
-                  <p className="text-[14px] text-[#4D5154]">#{item.id}</p>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar>
-                      <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
-                      />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <p>{item.name}</p>
-                  </div>
-                </TableCell>
-                <TableCell className="text-[14px]">{item.email}</TableCell>
-                <TableCell>{item.joinedDate}</TableCell>
-                <TableCell>
-                  <p className="bg-[#ECFDF3] text-[#027A48] rounded-[16px] px-3 py-1 w-fit">
-                    {item.status}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  <div
-                    className="p-2 border-[#E4E7EC] border rounded-[4px] w-fit cursor-pointer"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <EllipsisVertical />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="p-3">
-                        <DropdownMenuItem className="text-[#313131] font-bold mb-3">
-                          Activate User
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-[#313131] font-bold my-3">
-                          Deactivate User
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-[#313131] font-bold mt-3">
-                          Delete User
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+            {paginatedUsers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                  No users found
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              paginatedUsers.map((item) => (
+                <TableRow
+                  key={item.id}
+                  className="h-[70px] text-[14px] cursor-pointer hover:bg-[#F9FAFB]"
+                  onClick={() => router.push(`/admin/users/${item.id}`)}
+                >
+                  <TableCell>
+                    <p className="text-[14px] text-[#4D5154]">#{item.id}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar>
+                        <AvatarImage
+                          src={item.avatarUrl ?? "https://github.com/shadcn.png"}
+                          alt={item.fullName}
+                        />
+                        <AvatarFallback>{item.fullName.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <p>{item.fullName}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-[14px]">{item.email}</TableCell>
+                  <TableCell>{new Date(item.joinedDate).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <p className={`${
+                      item.status === "active" 
+                        ? "bg-[#ECFDF3] text-[#027A48]" 
+                        : "bg-[#FEF3F2] text-[#B42318]"
+                    } rounded-[16px] px-3 py-1 w-fit capitalize`}>
+                      {item.status}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    <div
+                      className="p-2 border-[#E4E7EC] border rounded-[4px] w-fit cursor-pointer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <EllipsisVertical />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="p-3">
+                          <DropdownMenuItem 
+                            className="text-[#313131] font-bold mb-3"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              activateUser.mutate(item.id);
+                            }}
+                            disabled={item.status === "active"}
+                          >
+                            Activate User
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-[#313131] font-bold my-3"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deactivateUser.mutate(item.id);
+                            }}
+                            disabled={item.status === "deactivated"}
+                          >
+                            Deactivate User
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-[#313131] font-bold mt-3">
+                            Delete User
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
         <div className="flex justify-between gap-5 items-center p-3 border border-[#EAECF0] rounded-b-[8px]">
-          <p>Page 1 of 10</p>
+          <p>Page {currentPage} of {totalPages || 1}</p>
           <div className="space-x-4">
-            <button className="border border-[#D0D5DD] rounded-[8px] px-3 py-1">
+            <button 
+              className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handlePrevious}
+              disabled={currentPage === 1}
+            >
               Previous
             </button>
-            <button className="border border-[#D0D5DD] rounded-[8px] px-3 py-1">
+            <button 
+              className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleNext}
+              disabled={currentPage === totalPages || totalPages === 0}
+            >
               Next
             </button>
           </div>

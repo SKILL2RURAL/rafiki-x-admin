@@ -2,14 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/apiHandler";
 import api from "@/lib/axios";
 
-// Define the expected shape of your analytics data.
-// You should adjust this to match your actual API response.
+// Define the expected shape of your analytics data based on actual API response
 export interface AnalyticsOverview {
-  activeUsers: {
+  activeUsers?: {
     total: number;
     topLocations: { country: string; count: number; percentage: number }[];
     locations: { country: string; count: number; percentage: number }[];
   };
+
   ageGroupDistribution: { count: number; label: string }[];
   genderDistribution: Record<string, number>;
   summary: {
@@ -23,9 +23,14 @@ export interface AnalyticsOverview {
 export const useAnalyticsOverview = () => {
   return useQuery<AnalyticsOverview>({
     queryKey: ["analytics-overview"],
-    queryFn: () => {
-      return apiRequest(() => api.get("/analytics/overview"));
+    queryFn: async () => {
+      const result: any = await apiRequest(() => api.get("/analytics/overview"));
+      
+      // Return the data from the API response
+      // If the API returns { success, message, data }, extract data
+      // Otherwise return the result as-is with safe defaults
+      return result?.data || result || {};
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

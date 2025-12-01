@@ -26,7 +26,6 @@ export interface AdminUserDetail {
   status?: string;
 }
 
-
 export interface SendMessagePayload {
   email: string;
   title: string;
@@ -44,12 +43,22 @@ export const useAdminUsers = () => {
     queryKey: ["admin-users"],
     queryFn: async () => {
       // apiRequest returns the response body: { success, message, data }
-      const response: any = await apiRequest(() => api.get("/admin/users"));
-      
+      const response = await apiRequest(() => api.get("/admin/users"));
+
       // Extract the users array from response.data
       const users = response?.data ?? [];
 
-      return users.map((u: any) => ({
+      interface User {
+        id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        createdAt: string;
+        status: string;
+        profilePhoto: string;
+      }
+
+      return users.map((u: User) => ({
         id: u.id,
         fullName: `${u.firstName} ${u.lastName}`,
         email: u.email,
@@ -67,8 +76,8 @@ export const useAdminUser = (id: string | number) => {
   return useQuery<AdminUserDetail>({
     queryKey: ["admin-user", id],
     queryFn: async () => {
-      const response: any = await apiRequest(() => api.get(`/admin/users/${id}`));
-      
+      const response = await apiRequest(() => api.get(`/admin/users/${id}`));
+
       // Extract the user object from response.data
       const u = response?.data;
 
@@ -96,7 +105,9 @@ export const useDeactivateUser = () => {
 
   return useMutation({
     mutationFn: async (userId: number) => {
-      return await apiRequest(() => api.patch(`/admin/users/${userId}/deactivate`));
+      return await apiRequest(() =>
+        api.patch(`/admin/users/${userId}/deactivate`)
+      );
     },
     onSuccess: () => {
       toast.success("User deactivated successfully");
@@ -104,7 +115,8 @@ export const useDeactivateUser = () => {
       qc.invalidateQueries({ queryKey: ["admin-user"] });
     },
     onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || "Failed to deactivate user";
+      const errorMessage =
+        error?.response?.data?.message || "Failed to deactivate user";
       toast.error(errorMessage);
     },
   });
@@ -118,7 +130,9 @@ export const useActivateUser = () => {
 
   return useMutation({
     mutationFn: async (userId: number) => {
-      return await apiRequest(() => api.patch(`/admin/users/${userId}/activate`));
+      return await apiRequest(() =>
+        api.patch(`/admin/users/${userId}/activate`)
+      );
     },
     onSuccess: () => {
       toast.success("User activated successfully");
@@ -126,7 +140,8 @@ export const useActivateUser = () => {
       qc.invalidateQueries({ queryKey: ["admin-user"] });
     },
     onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || "Failed to activate user";
+      const errorMessage =
+        error?.response?.data?.message || "Failed to activate user";
       toast.error(errorMessage);
     },
   });
@@ -144,7 +159,8 @@ export const useSendMessage = () => {
       toast.success("Message sent successfully");
     },
     onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || "Failed to send message";
+      const errorMessage =
+        error?.response?.data?.message || "Failed to send message";
       toast.error(errorMessage);
     },
   });

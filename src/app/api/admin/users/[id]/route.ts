@@ -10,28 +10,16 @@ export async function GET(
   const { id } = params;
   const cookieStore = await cookies();
 
-  // Try to get token
-  const token =
-    cookieStore.get("auth_token")?.value ||
-    cookieStore.get("__session")?.value;
-
-  // TEMPORARY fallback token
-  const BACKEND_TOKEN =
-    "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJhZG1pbkByYWZpa2l4Lm9yZyIsImlhdCI6MTc2NDQwMDg1OSwiZXhwIjoxNzY0NDg3MjU5fQ.VoI7mZWFLxcdVJ3wNvpnudvdaRXeRimUZQkGJ8c0i-7BVnlVawAkrRs8TvVNUxnECdG86Yejh_9HkMk1xw2_CQ";
-
-  const finalToken = token || BACKEND_TOKEN;
+  const token = cookieStore.get("auth_token")?.value;
 
   try {
-    const response = await fetch(
-      `${BACKEND_API_URL}/api/admin/users/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${finalToken}`,
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      }
-    );
+    const response = await fetch(`${BACKEND_API_URL}/api/admin/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -61,8 +49,7 @@ export async function PATCH(
 
   const cookieStore = await cookies();
   const token =
-    cookieStore.get("auth_token")?.value ||
-    cookieStore.get("__session")?.value;
+    cookieStore.get("auth_token")?.value || cookieStore.get("__session")?.value;
 
   const BACKEND_TOKEN =
     "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJhZG1pbkByYWZpa2l4Lm9yZyIsImlhdCI6MTc2NDQwMDg1OSwiZXhwIjoxNzY0NDg3MjU5fQ.VoI7mZWFLxcdVJ3wNvpnudvdaRXeRimUZQkGJ8c0i-7BVnlVawAkrRs8TvVNUxnECdG86Yejh_9HkMk1xw2_CQ";

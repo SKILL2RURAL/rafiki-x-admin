@@ -1,6 +1,10 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useActivateUser, useDeactivateUser, useAdminUsers } from "@/hook/useUser";
+import {
+  useActivateUser,
+  useDeactivateUser,
+  useAdminUsers,
+} from "@/hook/useUser";
 
 import {
   DropdownMenu,
@@ -20,6 +24,7 @@ import {
 import { EllipsisVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import UsersMetrics from "../../../components/Dashboard/Users/UsersMetrics";
 
 const UsersPage = () => {
   const router = useRouter();
@@ -27,20 +32,10 @@ const UsersPage = () => {
   const [active, setActive] = React.useState("All");
   const [currentPage, setCurrentPage] = React.useState(1);
   const ITEMS_PER_PAGE = 10;
-  
-  // All hooks must be at the top, before any conditional returns
+
   const { data, isLoading, isError, error } = useAdminUsers();
   const activateUser = useActivateUser();
   const deactivateUser = useDeactivateUser();
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="p-6">
-        <p className="text-sm text-muted-foreground">Loading users...</p>
-      </div>
-    );
-  }
 
   // Error state
   if (isError) {
@@ -54,19 +49,22 @@ const UsersPage = () => {
   }
 
   // Filter by name or email
-  let filteredUsers = data?.filter((user) => {
-    const q = searchQuery.toLowerCase();
-    return (
-      user.fullName.toLowerCase().includes(q) ||
-      user.email.toLowerCase().includes(q)
-    );
-  }) ?? [];
+  let filteredUsers =
+    data?.filter((user) => {
+      const q = searchQuery.toLowerCase();
+      return (
+        user.fullName.toLowerCase().includes(q) ||
+        user.email.toLowerCase().includes(q)
+      );
+    }) ?? [];
 
   // Filter by status
   if (active === "Active") {
-    filteredUsers = filteredUsers.filter(user => user.status === "active");
+    filteredUsers = filteredUsers.filter((user) => user.status === "active");
   } else if (active === "Deactivated") {
-    filteredUsers = filteredUsers.filter(user => user.status === "deactivated");
+    filteredUsers = filteredUsers.filter(
+      (user) => user.status === "deactivated"
+    );
   }
   // "All" shows everything
 
@@ -78,9 +76,9 @@ const UsersPage = () => {
   const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
 
   // Reset to page 1 when filters change
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [active, searchQuery]);
+  // React.useEffect(() => {
+  //   setCurrentPage(1);
+  // }, [active, searchQuery]);
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -97,29 +95,12 @@ const UsersPage = () => {
   return (
     <div>
       <h1 className="text-[20px] font-bold">Users</h1>
-      <p className="text-sm font-[400]">
+      <p className="text-sm font-normal">
         Oversee and manage all your order here
       </p>
       <div className="h-5" />
       {/* Metrics  */}
-      <div className="grid grid-cols-3 gap-5">
-        <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
-          <p className="text-[14px] text-[#A3AED0]">Total Users</p>
-          <p className="text-[36px] font-bold text-primary">{data?.length ?? 0}</p>
-        </div>
-        <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
-          <p className="text-[14px] text-[#A3AED0]">Active Users</p>
-          <p className="text-[36px] font-bold text-primary">
-            {data?.filter(u => u.status === "active").length ?? 0}
-          </p>
-        </div>
-        <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
-          <p className="text-[14px] text-[#A3AED0]">Deactivated Users</p>
-          <p className="text-[36px] font-bold text-primary">
-            {data?.filter(u => u.status === "deactivated").length ?? 0}
-          </p>
-        </div>
-      </div>
+      <UsersMetrics data={data || []} isLoading={isLoading} />
 
       {/* filter  */}
       <div className="flex gap-5 mt-10 bg-[#F4F4F5] rounded-[8px] px-3 py-2 w-fit">
@@ -134,7 +115,7 @@ const UsersPage = () => {
             <p
               className={` ${
                 active === item
-                  ? "bg-gradient-to-r from-[#51A3DA] to-[#60269E] text-transparent bg-clip-text font-bold"
+                  ? "bg-linear-to-r from-[#51A3DA] to-[#60269E] text-transparent bg-clip-text font-bold"
                   : "text-[#4D5154] text-[14px]"
               }`}
             >
@@ -160,7 +141,10 @@ const UsersPage = () => {
           <TableBody>
             {paginatedUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-10 text-muted-foreground"
+                >
                   No users found
                 </TableCell>
               </TableRow>
@@ -169,7 +153,7 @@ const UsersPage = () => {
                 <TableRow
                   key={item.id}
                   className="h-[70px] text-[14px] cursor-pointer hover:bg-[#F9FAFB]"
-                  onClick={() => router.push(`/admin/users/${item.id}`)}
+                  onClick={() => router.push(`/users/${item.id}`)}
                 >
                   <TableCell>
                     <p className="text-[14px] text-[#4D5154]">#{item.id}</p>
@@ -178,22 +162,28 @@ const UsersPage = () => {
                     <div className="flex items-center gap-2">
                       <Avatar>
                         <AvatarImage
-                          src={item.avatarUrl ?? "https://github.com/shadcn.png"}
+                          src={item.avatarUrl ?? ""}
                           alt={item.fullName}
                         />
-                        <AvatarFallback>{item.fullName.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>
+                          {item.fullName.charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
                       <p>{item.fullName}</p>
                     </div>
                   </TableCell>
                   <TableCell className="text-[14px]">{item.email}</TableCell>
-                  <TableCell>{new Date(item.joinedDate).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <p className={`${
-                      item.status === "active" 
-                        ? "bg-[#ECFDF3] text-[#027A48]" 
-                        : "bg-[#FEF3F2] text-[#B42318]"
-                    } rounded-[16px] px-3 py-1 w-fit capitalize`}>
+                    {new Date(item.joinedDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <p
+                      className={`${
+                        item.status === "active"
+                          ? "bg-[#ECFDF3] text-[#027A48]"
+                          : "bg-[#FEF3F2] text-[#B42318]"
+                      } rounded-[16px] px-3 py-1 w-fit capitalize`}
+                    >
                       {item.status}
                     </p>
                   </TableCell>
@@ -207,7 +197,7 @@ const UsersPage = () => {
                           <EllipsisVertical />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="p-3">
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-[#313131] font-bold mb-3"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -218,7 +208,7 @@ const UsersPage = () => {
                             Activate User
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-[#313131] font-bold my-3"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -242,16 +232,18 @@ const UsersPage = () => {
           </TableBody>
         </Table>
         <div className="flex justify-between gap-5 items-center p-3 border border-[#EAECF0] rounded-b-[8px]">
-          <p>Page {currentPage} of {totalPages || 1}</p>
+          <p>
+            Page {currentPage} of {totalPages || 1}
+          </p>
           <div className="space-x-4">
-            <button 
+            <button
               className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handlePrevious}
               disabled={currentPage === 1}
             >
               Previous
             </button>
-            <button 
+            <button
               className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleNext}
               disabled={currentPage === totalPages || totalPages === 0}

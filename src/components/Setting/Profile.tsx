@@ -76,7 +76,7 @@ export default function ProfileForm() {
         {/* Profile Photo Section */}
         <div className="flex items-center space-x-6">
           <div className="relative">
-            <div className="w-[120px] h-[120px] rounded-full bg-gradient-to-br from-[#51A3DA] to-[#60269E] flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
+            <div className="w-[120px] h-[120px] rounded-full bg-linear-to-br from-[#51A3DA] to-[#60269E] flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
               {form.photo ? (
                 <Image
                   src={form.photo}
@@ -156,7 +156,8 @@ export default function ProfileForm() {
             value={form.email}
             onChange={handleInput}
             className="w-[546px] h-[64px] rounded-md border border-gray-200 bg-gray-100 text-gray-700"
-            readOnly // Email should generally not be editable
+            readOnly
+            disabled
           />
         </div>
 

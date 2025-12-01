@@ -1,4 +1,5 @@
 import React from "react";
+import { Skeleton } from "../ui/skeleton";
 
 interface GenderData {
   [key: string]: number;
@@ -6,10 +7,12 @@ interface GenderData {
 
 interface GenderBubbleChartProps {
   data?: GenderData;
+  isLoading: boolean;
 }
 
 const GenderBubbleChart = ({
   data = { Male: 70, Female: 30 },
+  isLoading,
 }: GenderBubbleChartProps) => {
   const genderData = Object.entries(data)
     .sort(([, a], [, b]) => b - a)
@@ -20,6 +23,10 @@ const GenderBubbleChart = ({
 
   const firstGender = genderData[0];
   const secondGender = genderData[1];
+
+  if (isLoading) {
+    return <Skeleton className="h-[600px] w-full rounded-lg" />;
+  }
 
   return (
     <div className="w-full max-w-3xl mx-auto p-8 bg-white rounded-2xl shadow-sm">
@@ -116,13 +123,13 @@ const GenderBubbleChart = ({
       <div className="flex items-center justify-center gap-8 mt-8">
         {firstGender && (
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-gradient-to-b from-[#5B9BD5] to-[#7B3FF2]"></div>
+            <div className="w-4 h-4 rounded-full bg-linear-to-b from-[#5B9BD5] to-[#7B3FF2]"></div>
             <span className="text-gray-500 font-light">{firstGender.name}</span>
           </div>
         )}
         {secondGender && (
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-gradient-to-b from-[#4FC3F7] to-[#5B9BD5]"></div>
+            <div className="w-4 h-4 rounded-full bg-linear-to-b from-[#4FC3F7] to-[#5B9BD5]"></div>
             <span className="text-gray-500 font-light">
               {secondGender.name}
             </span>

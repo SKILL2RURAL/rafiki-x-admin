@@ -16,11 +16,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import MessageUserModal from "@/components/Dashboard/MessageUserModal";
 import { useParams } from "next/navigation";
 
-import { useAdminUser, useActivateUser, useDeactivateUser } from "@/hook/useUser";
-
+import {
+  useAdminUser,
+  useActivateUser,
+  useDeactivateUser,
+} from "@/hook/useUser";
 
 const UserDetailsPage = () => {
-  const { userId }: any = useParams();
+  const { userId }: { userId: string } = useParams();
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
 
   const { data: user, isLoading, isError } = useAdminUser(userId);
@@ -73,7 +76,7 @@ const UserDetailsPage = () => {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <Link href={"/admin/users"} className="text-sm flex gap-2 items-center">
+          <Link href={"/users"} className="text-sm flex gap-2 items-center">
             <ArrowLeft />
             Back
           </Link>
@@ -83,7 +86,7 @@ const UserDetailsPage = () => {
         </div>
 
         <button
-          className="text-white bg-gradient-to-r from-[#51A3DA] to-[#60269E] rounded-[4px] py-3 px-4 flex items-center gap-3 font-[500]"
+          className="text-white bg-linear-to-r from-[#51A3DA] to-[#60269E] rounded-[4px] py-3 px-4 flex items-center gap-3 font-medium"
           onClick={() => setIsMessageModalOpen(true)}
         >
           Message User
@@ -96,7 +99,7 @@ const UserDetailsPage = () => {
       <div className="grid grid-cols-2 gap-10">
         {/* USER INFORMATION */}
         <div className="space-y-2">
-          <h4 className="text-[18px] font-[600]">User Information</h4>
+          <h4 className="text-[18px] font-semibold">User Information</h4>
 
           <div className="shadow-md shadow-[#7090B01A] p-5 rounded-[4px]">
             <div className="flex justify-between items-center gap-5">
@@ -109,8 +112,8 @@ const UserDetailsPage = () => {
                 </Avatar>
 
                 <div>
-                  <p className="text-[16px] font-[600]">{user.fullName}</p>
-                  <p className="font-[500] text-sm text-[#909090]">
+                  <p className="text-[16px] font-semibold">{user.fullName}</p>
+                  <p className="font-medium text-sm text-[#909090]">
                     Joined: {new Date(user.createdAt).toDateString()}
                   </p>
                 </div>
@@ -141,12 +144,11 @@ const UserDetailsPage = () => {
           </div>
         </div>
 
-        {/* CURRENT PLAN (Dummy placeholder since backend doesn't provide) */}
-        <div className="space-y-2">
-          <h4 className="text-[18px] font-[600]">Current Plan</h4>
+        {/* <div className="space-y-2">
+          <h4 className="text-[18px] font-semibold">Current Plan</h4>
 
           <div className="shadow-md shadow-[#7090B01A] p-5 rounded-[4px]">
-            <div className="font-[600]">
+            <div className="font-semibold">
               <h3 className="text-[16px]">Basic Plan (Dummy)</h3>
               <p className="text-[32px]">$400.00</p>
             </div>
@@ -157,20 +159,20 @@ const UserDetailsPage = () => {
 
               <button
                 type="button"
-                className="font-bold text-[14px] bg-gradient-to-r from-[#51A3DA] to-[#60269E] py-3 px-4 rounded-[10px] text-white w-full"
+                className="font-bold text-[14px] bg-linear-to-r from-[#51A3DA] to-[#60269E] py-3 px-4 rounded-[10px] text-white w-full"
               >
                 Cancel Subscription
               </button>
             </form>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="h-5" />
 
       {/* BILLING TABLE (Dummy) */}
       <div className="flex items-center justify-between">
-        <p className="font-[600] text-[20px]">Billings</p>
+        <p className="font-semibold text-[20px]">Billings</p>
 
         <button className="px-5 py-3 bg-[#60269E] text-sm text-white rounded-[4px] flex items-center gap-3">
           Export CSV
@@ -223,11 +225,19 @@ const UserDetailsPage = () => {
 };
 
 // Helper Row Component
-const InfoRow = ({ label, value }: any) => (
+const InfoRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) => (
   <div className="flex items-center gap-10">
     <div className="grid grid-cols-2 w-full">
-      <p className="text-[#253B4B] text-[16px]">{label}:</p>
-      <p className="text-[16px] font-[600] text-[#253B4B]">{value}</p>
+      <p className="text-[#253B4B] text-[16px] max-w-[100px] truncate">
+        {label}:
+      </p>
+      <p className="text-[16px] font-semibold text-[#253B4B]">{value}</p>
     </div>
     <button className="rounded-full">
       <Image src={"/icons/copy-icon.svg"} alt="" width={25} height={25} />
@@ -235,11 +245,11 @@ const InfoRow = ({ label, value }: any) => (
   </div>
 );
 
-const InputDisplay = ({ label, value }: any) => (
-  <div className="grid space-y-2">
-    <label className="text-[#222222] text-[14px] font-[600]">{label}</label>
-    <input className="bg-[#F9F9F9] py-3 px-2" value={value} readOnly />
-  </div>
-);
+// const InputDisplay = ({ label, value }: any) => (
+//   <div className="grid space-y-2">
+//     <label className="text-[#222222] text-[14px] font-semibold">{label}</label>
+//     <input className="bg-[#F9F9F9] py-3 px-2" value={value} readOnly />
+//   </div>
+// );
 
 export default UserDetailsPage;

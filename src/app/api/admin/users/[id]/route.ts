@@ -5,9 +5,9 @@ import { NextResponse, NextRequest } from "next/server";
 // ---------------- GET USER BY ID ----------------
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const cookieStore = await cookies();
 
   const token = cookieStore.get("auth_token")?.value;
@@ -43,9 +43,9 @@ export async function GET(
 // ---------------- PATCH: ACTIVATE / DEACTIVATE ----------------
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   const cookieStore = await cookies();
   const token =

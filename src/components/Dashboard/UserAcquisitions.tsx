@@ -1,14 +1,16 @@
+"use client";
+
+import { useGetUserAquisitions } from "@/hook/useAdmin";
+import { useState } from "react";
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
   CartesianGrid,
   ResponsiveContainer,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { useState } from "react";
-import { useGetUserAquisitions } from "@/hook/useAdmin";
-import { Spinner } from "../ui/spinner";
+import { Skeleton } from "../ui/skeleton";
 
 export default function UserAcquisitions() {
   const currentYear = new Date().getFullYear().toString();
@@ -24,15 +26,11 @@ export default function UserAcquisitions() {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex h-[350px] w-full items-center justify-center">
-        <Spinner className="size-8" />
-      </div>
-    );
+    return <Skeleton className="h-[350px] w-full rounded-lg" />;
   }
 
   if (!userAcquisitions) {
-    return null; // Or some other placeholder if no data
+    return null;
   }
 
   return (

@@ -55,6 +55,7 @@ export interface User {
   lastName: string;
   profilePhoto?: string;
   // role: string;
+  status: string;
 }
 
 // GET CURRENT LOGGED IN USER (for AuthWrapper, uses cookie)

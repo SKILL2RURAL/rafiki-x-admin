@@ -8,7 +8,11 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
-import { useSendMessage, useAdminUser } from "@/hook/useUser";
+import {
+  useSendMessage,
+  useAdminUser,
+  SendMessagePayload,
+} from "@/hook/useUser";
 
 const MessageUserModal = ({
   isOpen,
@@ -48,12 +52,12 @@ const MessageUserModal = ({
         reader.onloadend = () => {
           const result = reader.result as string;
           // Remove the data URL prefix (e.g., "data:image/png;base64,")
-          const base64 = result.split(',')[1];
+          const base64 = result.split(",")[1];
           resolve(base64);
         };
         reader.onerror = reject;
       });
-      
+
       reader.readAsDataURL(image);
       base64Data = await base64Promise;
       filename = image.name;
@@ -61,24 +65,29 @@ const MessageUserModal = ({
     }
 
     // Build payload matching backend API structure
-    const payload: any = {
+    const payload: SendMessagePayload = {
       email: user.email, // Use the actual user email
       title,
       message,
+      ...(base64Data && filename && contentType
+        ? {
+            attachments: [
+              {
+                filename,
+                contentType,
+                base64Data,
+              },
+            ],
+          }
+        : {}),
     };
 
-    // Add attachments array if image exists
-    if (base64Data && filename && contentType) {
-      payload.attachments = [
-        {
-          filename,
-          contentType,
-          base64Data,
-        },
-      ];
-    }
-
-    console.log("Sending payload:", { ...payload, attachments: payload.attachments ? `[${payload.attachments.length} file(s)]` : undefined });
+    console.log("Sending payload:", {
+      ...payload,
+      attachments: payload.attachments
+        ? `[${payload.attachments.length} file(s)]`
+        : undefined,
+    });
 
     sendMessage.mutate(payload, {
       onSuccess: () => {
@@ -88,9 +97,8 @@ const MessageUserModal = ({
         setImagePreview(null);
         onClose();
       },
-      onError: (error: any) => {
+      onError: (error) => {
         console.error("Send message error:", error);
-        alert("Failed to send message: " + (error?.response?.data?.message || "Unknown error"));
       },
     });
   };
@@ -124,7 +132,7 @@ const MessageUserModal = ({
         <form className="space-y-3" onSubmit={handleSubmit}>
           {/* Title  */}
           <div>
-            <label className="font-[500] text-[16px]">Title</label>
+            <label className="font-medium text-[16px]">Title</label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -135,7 +143,7 @@ const MessageUserModal = ({
 
           {/* Message */}
           <div>
-            <label className="font-[500] text-[16px]">Message</label>
+            <label className="font-medium text-[16px]">Message</label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -146,7 +154,7 @@ const MessageUserModal = ({
 
           {/* Image */}
           <div>
-            <label className="font-[500] text-[16px]">Image (Optional)</label>
+            <label className="font-medium text-[16px]">Image (Optional)</label>
             <input
               type="file"
               ref={fileInputRef}
@@ -188,7 +196,7 @@ const MessageUserModal = ({
           <button
             type="submit"
             disabled={sendMessage.isPending || !user?.email}
-            className="font-bold text-[14px] bg-gradient-to-r from-[#51A3DA] to-[#60269E] py-3 px-4 rounded-[10px] text-white w-full disabled:opacity-50"
+            className="font-bold text-[14px] bg-linear-to-r from-[#51A3DA] to-[#60269E] py-3 px-4 rounded-[10px] text-white w-full disabled:opacity-50"
           >
             {sendMessage.isPending ? "Sending..." : "Send Message"}
           </button>

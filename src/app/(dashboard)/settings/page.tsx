@@ -37,7 +37,7 @@ const SettingsPage = () => {
             }}
             className={
               tab === tabItem
-                ? "w-full h-[36px] rounded-[8px] bg-[#F2F8FC] text-center font-bold  bg-gradient-to-r from-[#51A3DA] to-[#60269E] bg-clip-text text-transparent border border-[#51A3DA] cursor-pointer"
+                ? "w-full h-[36px] rounded-[8px] bg-[#F2F8FC] text-center font-bold  bg-linear-to-r from-[#51A3DA] to-[#60269E] bg-clip-text text-transparent border border-[#51A3DA] cursor-pointer"
                 : "cursor-pointer"
             }
             onClick={() => {

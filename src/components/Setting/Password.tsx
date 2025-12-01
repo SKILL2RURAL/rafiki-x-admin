@@ -88,7 +88,7 @@ const Password = () => {
           Update your photo and personal details here.
         </p>
       </div>
-      <div className="w-full h-[1px] bg-[#EAECF0] border" />
+      <div className="w-full h-px bg-[#EAECF0] border" />
       <form onSubmit={handleSubmit} className="space-y-6 max-w-[40vw]">
         {/* Current Password */}
         <div className="space-y-1">
@@ -147,7 +147,7 @@ const Password = () => {
           </Button>
           <button
             type="submit"
-            className="text-white bg-gradient w-full h-[52px] rounded-[12px] border border-gradient"
+            className="text-white bg-gradient w-full h-[52px] rounded-[12px] border border-gradient flex items-center justify-center"
           >
             {isPending ? <Spinner /> : "Update password"}
           </button>

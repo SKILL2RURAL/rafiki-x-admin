@@ -14,6 +14,11 @@ import {
 import { Skeleton } from "../ui/skeleton";
 import { LabelContentType } from "recharts/types/component/Label";
 
+interface AgeGroupDataEntry {
+  count: number;
+  label: string;
+}
+
 interface CustomLabelProps extends SVGProps<SVGTextElement> {
   x?: string | number;
   y?: string | number;
@@ -23,11 +28,10 @@ interface CustomLabelProps extends SVGProps<SVGTextElement> {
   index?: number;
   parentViewBox?: string;
   viewBox?: string;
-  payload?: any;
+  payload?: AgeGroupDataEntry;
   dataKey?: string | number;
   textBreakAll?: boolean;
   zIndex?: number;
-  content?: any;
 }
 
 const CustomLabel = (props: CustomLabelProps) => {
@@ -43,7 +47,6 @@ const CustomLabel = (props: CustomLabelProps) => {
     index,
     textBreakAll,
     zIndex,
-    content,
     ...rest
   } = props;
 

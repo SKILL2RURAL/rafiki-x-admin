@@ -8,7 +8,11 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
-import { useSendMessage, useAdminUser } from "@/hook/useUser";
+import {
+  useSendMessage,
+  useAdminUser,
+  SendMessagePayload,
+} from "@/hook/useUser";
 
 const MessageUserModal = ({
   isOpen,
@@ -61,22 +65,22 @@ const MessageUserModal = ({
     }
 
     // Build payload matching backend API structure
-    const payload: any = {
+    const payload: SendMessagePayload = {
       email: user.email, // Use the actual user email
       title,
       message,
+      ...(base64Data && filename && contentType
+        ? {
+            attachments: [
+              {
+                filename,
+                contentType,
+                base64Data,
+              },
+            ],
+          }
+        : {}),
     };
-
-    // Add attachments array if image exists
-    if (base64Data && filename && contentType) {
-      payload.attachments = [
-        {
-          filename,
-          contentType,
-          base64Data,
-        },
-      ];
-    }
 
     console.log("Sending payload:", {
       ...payload,
@@ -95,10 +99,6 @@ const MessageUserModal = ({
       },
       onError: (error) => {
         console.error("Send message error:", error);
-        alert(
-          "Failed to send message: " +
-            (error?.response?.data?.message || "Unknown error")
-        );
       },
     });
   };

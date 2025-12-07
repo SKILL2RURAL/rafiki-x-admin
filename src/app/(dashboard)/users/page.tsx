@@ -48,6 +48,8 @@ const UsersPage = () => {
     );
   }
 
+  console.log("All Users Data:", data);
+
   // Filter by name or email
   let filteredUsers =
     data?.filter((user) => {
@@ -74,6 +76,8 @@ const UsersPage = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  
 
   // Reset to page 1 when filters change
   // React.useEffect(() => {

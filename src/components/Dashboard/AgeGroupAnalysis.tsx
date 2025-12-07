@@ -35,20 +35,7 @@ interface CustomLabelProps extends SVGProps<SVGTextElement> {
 }
 
 const CustomLabel = (props: CustomLabelProps) => {
-  const {
-    x,
-    y,
-    width,
-    value,
-    parentViewBox,
-    viewBox,
-    payload,
-    dataKey,
-    index,
-    textBreakAll,
-    zIndex,
-    ...rest
-  } = props;
+  const { x, y, width, value } = props;
 
   const xNum = Number(x || 0);
   const yNum = Number(y || 0);
@@ -61,9 +48,7 @@ const CustomLabel = (props: CustomLabelProps) => {
       y={yNum + 18}
       fill="#1f2937"
       fontSize={16}
-      fontWeight={400}
-      {...rest}
-    >
+      fontWeight={400}>
       {valueNum} {valueNum === 1 ? "user" : "users"}
     </text>
   );
@@ -107,8 +92,7 @@ export default function AgeGroupAnalysis({
             <BarChart
               data={data}
               layout="vertical"
-              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-            >
+              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
               <XAxis
                 type="number"
                 axisLine={false}

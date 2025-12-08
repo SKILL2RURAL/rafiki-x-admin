@@ -26,6 +26,11 @@ const Sidebar = () => {
       href: "/users",
     },
     {
+      name: "Reviews",
+      icon: <MessageCircle size={iconSize} />,
+      href: "/review",
+    },
+    {
       name: "Settings",
       icon: <Settings size={iconSize} />,
       href: "/settings",

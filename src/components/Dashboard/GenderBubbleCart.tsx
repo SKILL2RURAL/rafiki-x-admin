@@ -1,28 +1,61 @@
 import React from "react";
 import { Skeleton } from "../ui/skeleton";
 
-interface GenderData {
-  [key: string]: number;
+interface BubbleChartDataItem {
+  name: string;
+  percentage: number;
 }
 
-interface GenderBubbleChartProps {
-  data?: GenderData;
+interface BubbleChartProps {
+  data?: BubbleChartDataItem[] | Record<string, number>;
   isLoading: boolean;
+  title?: string;
+  description?: string;
+  gradientId?: string;
 }
 
-const GenderBubbleChart = ({
-  data = { Male: 70, Female: 30 },
+const BubbleChart = ({
+  data,
   isLoading,
-}: GenderBubbleChartProps) => {
-  const genderData = Object.entries(data)
-    .sort(([, a], [, b]) => b - a)
-    .map(([key, value]) => ({
-      name: key,
-      percentage: Math.round(value),
-    }));
+  title = "Users",
+  description = "This section provides an analysis or insights",
+  gradientId = "bubble",
+}: BubbleChartProps) => {
+  // Normalize data format - handle both array and object formats
+  let chartData: BubbleChartDataItem[] = [];
 
-  const firstGender = genderData[0];
-  const secondGender = genderData[1];
+  if (Array.isArray(data)) {
+    chartData = data
+      .map((item) => ({
+        name: item.name,
+        percentage: Math.round(item.percentage),
+      }))
+      .sort((a, b) => b.percentage - a.percentage);
+  } else if (data && typeof data === "object" && !Array.isArray(data)) {
+    chartData = Object.entries(data)
+      .sort(([, a], [, b]) => {
+        const valA =
+          typeof a === "number"
+            ? a
+            : (a as { percentage?: number })?.percentage || 0;
+        const valB =
+          typeof b === "number"
+            ? b
+            : (b as { percentage?: number })?.percentage || 0;
+        return valB - valA;
+      })
+      .map(([key, value]) => ({
+        name: key,
+        percentage: Math.round(
+          typeof value === "number"
+            ? value
+            : (value as { percentage?: number })?.percentage || 0
+        ),
+      }));
+  }
+
+  const firstItem = chartData[0];
+  const secondItem = chartData[1];
 
   if (isLoading) {
     return <Skeleton className="h-[600px] w-full rounded-lg" />;
@@ -31,15 +64,13 @@ const GenderBubbleChart = ({
   return (
     <div className="w-full max-w-3xl mx-auto p-8 bg-white rounded-2xl shadow-sm">
       <div className="mb-2">
-        <h2 className="text-2xl font-semibold text-gray-800">Users</h2>
-        <p className="text-gray-500 mt-1">
-          This section provides an analysis or insights into users gender
-        </p>
+        <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
+        <p className="text-gray-500 mt-1">{description}</p>
       </div>
 
       <div className="relative h-96 flex items-center justify-center mt-8">
-        {/* First Gender Circle - Larger, behind */}
-        {firstGender && (
+        {/* First Item Circle - Larger, behind */}
+        {firstItem && (
           <svg
             className="absolute"
             width="400"
@@ -48,7 +79,7 @@ const GenderBubbleChart = ({
           >
             <defs>
               <linearGradient
-                id="firstGradient"
+                id={`firstGradient-${gradientId}`}
                 x1="0%"
                 y1="0%"
                 x2="0%"
@@ -62,7 +93,7 @@ const GenderBubbleChart = ({
               cx="180"
               cy="200"
               r="140"
-              fill="url(#firstGradient)"
+              fill={`url(#firstGradient-${gradientId})`}
               opacity="0.95"
             />
             <text
@@ -72,13 +103,13 @@ const GenderBubbleChart = ({
               dominantBaseline="middle"
               className="text-6xl font-bold fill-white"
             >
-              {firstGender.percentage}%
+              {firstItem.percentage}%
             </text>
           </svg>
         )}
 
-        {/* Second Gender Circle - Smaller, in front */}
-        {secondGender && (
+        {/* Second Item Circle - Smaller, in front */}
+        {secondItem && (
           <svg
             className="absolute"
             width="300"
@@ -87,7 +118,7 @@ const GenderBubbleChart = ({
           >
             <defs>
               <linearGradient
-                id="secondGradient"
+                id={`secondGradient-${gradientId}`}
                 x1="0%"
                 y1="0%"
                 x2="0%"
@@ -101,7 +132,7 @@ const GenderBubbleChart = ({
               cx="150"
               cy="150"
               r="100"
-              fill="url(#secondGradient)"
+              fill={`url(#secondGradient-${gradientId})`}
               opacity="0.95"
               stroke="white"
               strokeWidth="4"
@@ -113,7 +144,7 @@ const GenderBubbleChart = ({
               dominantBaseline="middle"
               className="text-5xl font-bold fill-white"
             >
-              {secondGender.percentage}%
+              {secondItem.percentage}%
             </text>
           </svg>
         )}
@@ -121,18 +152,16 @@ const GenderBubbleChart = ({
 
       {/* Legend */}
       <div className="flex items-center justify-center gap-8 mt-8">
-        {firstGender && (
+        {firstItem && (
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full bg-linear-to-b from-[#5B9BD5] to-[#7B3FF2]"></div>
-            <span className="text-gray-500 font-light">{firstGender.name}</span>
+            <span className="text-gray-500 font-light">{firstItem.name}</span>
           </div>
         )}
-        {secondGender && (
+        {secondItem && (
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full bg-linear-to-b from-[#4FC3F7] to-[#5B9BD5]"></div>
-            <span className="text-gray-500 font-light">
-              {secondGender.name}
-            </span>
+            <span className="text-gray-500 font-light">{secondItem.name}</span>
           </div>
         )}
       </div>
@@ -140,4 +169,7 @@ const GenderBubbleChart = ({
   );
 };
 
-export default GenderBubbleChart;
+export default BubbleChart;
+
+// Export with original name for backward compatibility
+export const GenderBubbleChart = BubbleChart;

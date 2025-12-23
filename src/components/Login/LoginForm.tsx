@@ -65,7 +65,8 @@ export function LoginForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 font-satoshi">
+        className="space-y-8 font-satoshi w-fit"
+      >
         {/* Email */}
         <FormField
           control={form.control}
@@ -106,7 +107,8 @@ export function LoginForm() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-3 flex items-center text-gray-300 hover:text-white"
-                    tabIndex={-1}>
+                    tabIndex={-1}
+                  >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
@@ -129,7 +131,8 @@ export function LoginForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-[400px] h-[48px] rounded-[8px] bg-gradient border text-[16px] font-[500] border-white">
+          className="w-[400px] h-[48px] rounded-[8px] bg-gradient border text-[16px] font-medium border-white"
+        >
           {isLoading ? <Spinner color="white" /> : "Log in"}
         </Button>
       </form>

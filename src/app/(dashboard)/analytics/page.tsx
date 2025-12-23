@@ -2,10 +2,14 @@
 
 import AnalyticsMetrics from "@/components/Dashboard/Analytics/AnalyticsMetrics";
 import GenderBubbleChart from "@/components/Dashboard/GenderBubbleCart";
-import { useAnalyticsOverview } from "@/hook/useAnalytics";
+import {
+  useAnalyticsOverview,
+  useSubscriptionOverview,
+} from "@/hook/useAnalytics";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
+// User Analytics components
 const ActiveUsers = dynamic(
   () => import("@/components/Dashboard/Analytics/ActiveUsers")
 );
@@ -17,14 +21,33 @@ const UserAcquisitions = dynamic(
   () => import("@/components/Dashboard/UserAcquisitions")
 );
 
+// Subscription Analytics components
+const NewSubscribers = dynamic(
+  () => import("@/components/Dashboard/Analytics/NewSubscribers")
+);
+const SubscriptionUsers = dynamic(
+  () => import("@/components/Dashboard/Analytics/SubscriptionUsers")
+);
+const SubscriptionModels = dynamic(
+  () => import("@/components/Dashboard/Analytics/SubscriptionModels")
+);
+const MRRChart = dynamic(
+  () => import("@/components/Dashboard/Analytics/MRRChart")
+);
+
 const AnalyticsPage = () => {
   const [active, setActive] = useState("Users");
   const { data: analyticsOverview, isLoading } = useAnalyticsOverview();
+  const { data: subscriptionOverview } = useSubscriptionOverview();
 
   return (
     <div>
       {/* Metrics  */}
-      <AnalyticsMetrics data={analyticsOverview} isLoading={isLoading} />
+      <AnalyticsMetrics
+        data={analyticsOverview}
+        subscriptionData={subscriptionOverview}
+        isLoading={isLoading}
+      />
 
       {/* switch button  */}
       <div className="flex gap-5 mt-10 bg-[#F4F4F5] rounded-[8px] px-3 py-2 w-fit">
@@ -50,25 +73,46 @@ const AnalyticsPage = () => {
       </div>
       <div className="h-10" />
 
-      {/* USER ACQUISITION  */}
-      <UserAcquisitions />
-      <div className="grid grid-cols-2 gap-5 mt-10">
-        {/* Users  */}
-        <GenderBubbleChart
-          data={analyticsOverview?.genderDistribution}
-          isLoading={isLoading}
-        />
-        {/* Age Group  */}
-        <AgeGroupAnalysis
-          data={analyticsOverview?.ageGroupDistribution || []}
-          isLoading={isLoading}
-        />
-      </div>
+      {active === "Users" ? (
+        <>
+          {/* USER ACQUISITION  */}
+          <UserAcquisitions />
+          <div className="grid grid-cols-2 gap-5 mt-10">
+            {/* Users  */}
+            <GenderBubbleChart
+              data={analyticsOverview?.genderDistribution}
+              isLoading={isLoading}
+            />
+            {/* Age Group  */}
+            <AgeGroupAnalysis
+              data={analyticsOverview?.ageGroupDistribution || []}
+              isLoading={isLoading}
+            />
+          </div>
 
-      <ActiveUsers
-        data={analyticsOverview?.activeUsers}
-        isLoading={isLoading}
-      />
+          <ActiveUsers
+            data={analyticsOverview?.activeUsers}
+            isLoading={isLoading}
+          />
+        </>
+      ) : (
+        <>
+          {/* NEW SUBSCRIBERS  */}
+          <NewSubscribers />
+
+          <div className="grid grid-cols-2 gap-5 mt-10 items-start">
+            {/* Subscription Users (Donut Chart)  */}
+            <SubscriptionUsers />
+            {/* Subscription Models (Horizontal Bar Chart)  */}
+            <SubscriptionModels />
+          </div>
+
+          {/* MRR Chart  */}
+          <div className="mt-10">
+            <MRRChart />
+          </div>
+        </>
+      )}
     </div>
   );
 };

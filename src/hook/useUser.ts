@@ -70,12 +70,12 @@ export const useAdminUsers = () => {
     queryKey: ["admin-users"],
     queryFn: async () => {
       // apiRequest returns the response body: { success, message, data }
-      const response = await apiRequest<ApiResponse<RawUser[]>>(() =>
-        api.get("/admin/users")
+      const response = await apiRequest<ApiResponse<{ content: RawUser[] }>>(
+        () => api.get("/admin/users")
       );
 
       // Extract the users array from response.data
-      const users = response?.data ?? [];
+      const users = response?.data.content ?? [];
 
       return users.map((u: RawUser) => ({
         id: Number(u.id),

@@ -30,10 +30,13 @@ const UsersPage = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [active, setActive] = React.useState("All");
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = React.useState(0);
   const ITEMS_PER_PAGE = 10;
 
-  const { data, isLoading, isError, error } = useAdminUsers();
+  const { data, isLoading, isError, error } = useAdminUsers({
+    page: currentPage,
+    size: ITEMS_PER_PAGE,
+  });
   const activateUser = useActivateUser();
   const deactivateUser = useDeactivateUser();
 
@@ -48,11 +51,10 @@ const UsersPage = () => {
     );
   }
 
-  console.log("All Users Data:", data);
-
-  // Filter by name or email
+  // Filter by name or email (client-side filtering for search)
   let filteredUsers =
-    data?.filter((user) => {
+    data?.content?.filter((user) => {
+      if (!searchQuery) return true;
       const q = searchQuery.toLowerCase();
       return (
         user.fullName.toLowerCase().includes(q) ||
@@ -60,7 +62,7 @@ const UsersPage = () => {
       );
     }) ?? [];
 
-  // Filter by status
+  // Filter by status (client-side filtering)
   if (active === "Active") {
     filteredUsers = filteredUsers.filter((user) => user.status === "active");
   } else if (active === "Deactivated") {
@@ -70,28 +72,14 @@ const UsersPage = () => {
   }
   // "All" shows everything
 
-  // Pagination calculations
-  const totalItems = filteredUsers.length;
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-  
-
-  // Reset to page 1 when filters change
-  // React.useEffect(() => {
-  //   setCurrentPage(1);
-  // }, [active, searchQuery]);
-
   const handlePrevious = () => {
-    if (currentPage > 1) {
+    if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
   };
 
   const handleNext = () => {
-    if (currentPage < totalPages) {
+    if (data && !data.last) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -104,7 +92,7 @@ const UsersPage = () => {
       </p>
       <div className="h-5" />
       {/* Metrics  */}
-      <UsersMetrics data={data || []} isLoading={isLoading} />
+      <UsersMetrics data={data?.content || []} isLoading={isLoading} />
 
       {/* filter  */}
       <div className="flex gap-5 mt-10 bg-[#F4F4F5] rounded-[8px] px-3 py-2 w-fit">
@@ -143,7 +131,7 @@ const UsersPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedUsers.length === 0 ? (
+            {filteredUsers.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -153,7 +141,7 @@ const UsersPage = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedUsers.map((item) => (
+              filteredUsers.map((item) => (
                 <TableRow
                   key={item.id}
                   className="h-[70px] text-[14px] cursor-pointer hover:bg-[#F9FAFB]"
@@ -235,22 +223,25 @@ const UsersPage = () => {
             )}
           </TableBody>
         </Table>
-        <div className="flex justify-between gap-5 items-center p-3 border border-[#EAECF0] rounded-b-[8px]">
-          <p>
-            Page {currentPage} of {totalPages || 1}
+        <div className="flex justify-between gap-5 items-center p-3 border-t border-[#EAECF0] bg-white rounded-b-lg">
+          <p className="text-gray-700">
+            Page {data ? data.page + 1 : 1} of {data?.totalPages || 1}
           </p>
-          <div className="space-x-4">
+          <div className="flex gap-4">
             <button
-              className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               onClick={handlePrevious}
-              disabled={currentPage === 1}
+              disabled={data?.first || currentPage === 0}
             >
               Previous
             </button>
             <button
-              className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               onClick={handleNext}
-              disabled={currentPage === totalPages || totalPages === 0}
+              disabled={
+                data?.last ||
+                (data?.totalPages ? currentPage >= data.totalPages - 1 : false)
+              }
             >
               Next
             </button>

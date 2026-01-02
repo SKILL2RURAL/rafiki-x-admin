@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { useChangePassword } from "@/hook/useAuth";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
+import { AxiosError } from "axios";
 
 type PasswordData = {
   currentPassword: string;
@@ -74,8 +75,12 @@ const Password = () => {
         });
         toast.success("Password updated successfully!");
       },
-      onError: (error) => {
-        toast.error(`${error.message}`);
+      onError: (error: Error | AxiosError) => {
+        const errorMessage =
+          (error instanceof AxiosError && error.response?.data?.message) ||
+          error.message ||
+          "Failed to change password";
+        toast.error(errorMessage);
       },
     });
   };

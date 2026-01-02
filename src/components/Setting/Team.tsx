@@ -50,7 +50,9 @@ export default function TeamPage() {
       </div>
 
       {/* Team Members Info */}
-      <p className="text-gray-500 mb-2">Team Members- 4</p>
+      <p className="text-gray-500 mb-2">
+        Team Members- {admins?.totalElements}
+      </p>
 
       {/* Table */}
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
@@ -70,7 +72,7 @@ export default function TeamPage() {
 
           <tbody>
             {admins &&
-              admins.map((team, idx) => (
+              admins.content.map((team, idx) => (
                 <tr key={idx} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-4">
                     <input type="checkbox" className="accent-[#51A3DA]" />
@@ -109,7 +111,7 @@ export default function TeamPage() {
                 </tr>
               ))}
 
-            {(!admins || admins.length === 0) && (
+            {(!admins || admins.content.length === 0) && (
               <tr>
                 <td colSpan={6} className="text-center py-8 text-gray-400">
                   No results found.

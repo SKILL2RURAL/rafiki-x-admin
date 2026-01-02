@@ -63,12 +63,7 @@ export const useUser = () => {
   return useQuery<User>({
     queryKey: ["user"],
     queryFn: async () => {
-      const res = await fetch("/api/auth/me");
-
-      if (!res.ok) {
-        throw new Error("Not authenticated");
-      }
-      return res.json();
+      return apiRequest(() => api.get("/auth/me"));
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false, // Don't retry on auth errors
@@ -95,13 +90,7 @@ export const useChangePassword = () => {
       newPassword: string;
       confirmNewPassword: string;
     }) => {
-      const res = await fetch("/api/auth/change-password", {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      return res.json();
+      return apiRequest(() => api.post("/auth/change-password", payload));
     },
   });
 };

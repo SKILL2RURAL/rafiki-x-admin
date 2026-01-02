@@ -3,8 +3,8 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const cookieStore = cookies();
-  const token = (await cookieStore).get("auth_token")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
 
   if (!token) {
     return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
@@ -14,9 +14,12 @@ export async function POST(request: Request) {
   const { currentPassword, newPassword, confirmNewPassword } = body;
 
   try {
-    const res = await fetch(`${BACKEND_API_URL}/api/auth/change-password`, {
+    const res = await fetch(`${BACKEND_API_URL}/api/admin/change-password`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         currentPassword,
         newPassword,

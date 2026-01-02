@@ -64,27 +64,71 @@ interface RawUserDetail {
   status?: string;
 }
 
+// Paginated Users Response
+export interface PaginatedUsersResponse {
+  content: AdminUser[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
 // FETCH ALL USERS
-export const useAdminUsers = () => {
-  return useQuery<AdminUser[]>({
-    queryKey: ["admin-users"],
+export const useAdminUsers = ({
+  page = 0,
+  size = 10,
+  sortBy = "id",
+  sortDir = "asc",
+}: {
+  page?: number;
+  size?: number;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+} = {}) => {
+  return useQuery<PaginatedUsersResponse>({
+    queryKey: ["admin-users", { page, size, sortBy, sortDir }],
     queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("size", size.toString());
+      params.append("sortBy", sortBy);
+      params.append("sortDir", sortDir);
+
       // apiRequest returns the response body: { success, message, data }
-      const response = await apiRequest<ApiResponse<{ content: RawUser[] }>>(
-        () => api.get("/admin/users")
-      );
+      const response = await apiRequest<
+        ApiResponse<{
+          content: RawUser[];
+          totalElements: number;
+          totalPages: number;
+          size: number;
+          page: number;
+          first: boolean;
+          last: boolean;
+        }>
+      >(() => api.get(`/admin/users?${params.toString()}`));
 
       // Extract the users array from response.data
-      const users = response?.data.content ?? [];
+      const users = response?.data?.content ?? [];
+      const paginationInfo = response?.data;
 
-      return users.map((u: RawUser) => ({
-        id: Number(u.id),
-        fullName: `${u.firstName} ${u.lastName}`,
-        email: u.email,
-        joinedDate: u.createdAt,
-        status: u.status === "ACTIVE" ? "active" : "deactivated",
-        avatarUrl: u.profilePhoto,
-      }));
+      return {
+        content: users.map((u: RawUser) => ({
+          id: Number(u.id),
+          fullName: `${u.firstName} ${u.lastName}`,
+          email: u.email,
+          joinedDate: u.createdAt,
+          status: u.status === "ACTIVE" ? "active" : "deactivated",
+          avatarUrl: u.profilePhoto,
+        })),
+        page: paginationInfo?.page ?? page,
+        size: paginationInfo?.size ?? size,
+        totalElements: paginationInfo?.totalElements ?? 0,
+        totalPages: paginationInfo?.totalPages ?? 0,
+        first: paginationInfo?.first ?? true,
+        last: paginationInfo?.last ?? true,
+      };
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

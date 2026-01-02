@@ -20,7 +20,7 @@ api.interceptors.response.use(
       url: error.config?.url,
       data: error.response?.data,
     });
-    
+
     if (error.code === "ERR_NETWORK") {
       toast.error("Network error. Please check your internet connection.");
       return Promise.reject(error);
@@ -29,17 +29,19 @@ api.interceptors.response.use(
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
       toast.error("Session expired. Please login again.");
-      if (typeof window !== "undefined") {
-        setTimeout(() => {
-          window.location.href = "/sign-in";
-        }, 1500);
-      }
+      // if (typeof window !== "undefined") {
+      //   setTimeout(() => {
+      //     window.location.href = "/login";
+      //   }, 1500);
+      // }
       return Promise.reject(error);
     }
 
     // Handle 403 Forbidden
     if (error.response?.status === 403) {
-      const message = error.response?.data?.message || "Access denied - Admin permissions required";
+      const message =
+        error.response?.data?.message ||
+        "Access denied - Admin permissions required";
       toast.error(message);
       return Promise.reject(error);
     }
@@ -57,7 +59,8 @@ api.interceptors.response.use(
     }
 
     // Generic error handler
-    const errorMessage = error.response?.data?.message || error.message || "Something went wrong";
+    const errorMessage =
+      error.response?.data?.message || error.message || "Something went wrong";
     toast.error(errorMessage);
 
     return Promise.reject(error);

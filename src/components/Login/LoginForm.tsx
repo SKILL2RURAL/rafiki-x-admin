@@ -45,10 +45,8 @@ export function LoginForm() {
       });
 
       if (response.ok) {
-        // The httpOnly cookie is set by the server.
-        // We just need to redirect on success.
         router.push("/");
-        router.refresh(); // Recommended to refresh server components and get new data
+        router.refresh();
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Login failed. Please try again.");

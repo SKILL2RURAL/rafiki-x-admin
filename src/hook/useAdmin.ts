@@ -19,7 +19,15 @@ export const useAdmins = () => {
       if (!res.ok) {
         throw new Error("Failed to fetch admins");
       }
-      return res.json() as Promise<Admin[]>;
+      return res.json() as Promise<{
+        content: Admin[];
+        totalElements: number;
+        totalPages: number;
+        size: number;
+        page: number;
+        first: boolean;
+        last: boolean;
+      }>;
     },
   });
 };

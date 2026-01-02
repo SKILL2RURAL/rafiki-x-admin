@@ -94,3 +94,52 @@ export const useChangePassword = () => {
     },
   });
 };
+
+// UPLOAD IMAGE
+export const useUploadImage = () => {
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "profile");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to upload image");
+      }
+
+      return data;
+    },
+  });
+};
+
+// UPDATE PROFILE
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      adminId,
+      payload,
+    }: {
+      adminId: string;
+      payload: {
+        firstName: string;
+        lastName: string;
+        profilePhoto: string;
+      };
+    }) => {
+      return apiRequest(() => api.patch(`/admin/admins/${adminId}`, payload));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+    },
+  });
+};

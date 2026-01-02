@@ -105,7 +105,7 @@ export default function TeamPage() {
                     //     : "bg-[#FEF6F7] text-[#E71D36]"
                     // }`}
                     >
-                      {""}
+                      Active
                     </span>
                   </td>
                 </tr>

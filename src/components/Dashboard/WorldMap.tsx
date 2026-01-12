@@ -178,7 +178,7 @@ export default function WorldMap() {
           }}
         >
           <div className="flex items-center gap-2">
-            <div className="w-4 h-3 bg-gradient-to-r from-green-500 to-green-600 rounded-sm"></div>
+            <div className="w-4 h-3 bg-linear-to-r from-green-500 to-green-600 rounded-sm"></div>
             <span className="text-sm font-medium text-gray-900">
               {hoveredLocation}
             </span>

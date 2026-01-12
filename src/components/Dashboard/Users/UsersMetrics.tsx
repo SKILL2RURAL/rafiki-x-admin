@@ -1,5 +1,9 @@
+"use client";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdminUser } from "@/hook/useUser";
+import { useUserStats } from "@/hook/useAnalytics";
+import { useEffect } from "react";
 
 const UsersMetrics = ({
   data,
@@ -8,7 +12,9 @@ const UsersMetrics = ({
   data: AdminUser[];
   isLoading: boolean;
 }) => {
-  if (!isLoading) {
+  const { data: userStats, isLoading: userStatsLoading } = useUserStats();
+
+  if (!userStatsLoading) {
     <div className="grid grid-cols-3 gap-5">
       {Array.from({ length: 3 }).map((_, index) => {
         return (
@@ -23,19 +29,19 @@ const UsersMetrics = ({
       <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
         <p className="text-[14px] text-[#A3AED0]">Total Users</p>
         <p className="text-[36px] font-bold text-primary">
-          {data?.length ?? 0}
+          {userStats.totalUsers ?? 0}
         </p>
       </div>
       <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
         <p className="text-[14px] text-[#A3AED0]">Active Users</p>
         <p className="text-[36px] font-bold text-primary">
-          {data?.filter((user) => user.status === "active").length ?? 0}
+          {userStats.activeUsers ?? 0}
         </p>
       </div>
       <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
         <p className="text-[14px] text-[#A3AED0]">Deactivated Users</p>
         <p className="text-[36px] font-bold text-primary">
-          {data?.filter((u) => u.status === "deactivated").length ?? 0}
+          {userStats.deactivatedUsers ?? 0}
         </p>
       </div>
     </div>

@@ -221,12 +221,15 @@ export const useActivateUser = () => {
 // SEND MESSAGE
 // -----------------------------
 export const useSendMessage = () => {
+  const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: SendMessagePayload) => {
       return await apiRequest(() => api.post(`/admin/users/message`, payload));
     },
     onSuccess: () => {
       toast.success("Message sent successfully");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (error: Error | AxiosError) => {
       const errorMessage =
@@ -247,6 +250,30 @@ export const useUserAcquisition = (period: "month" | "year") => {
       return await apiRequest(() =>
         api.get(`/admin/analytics/user-acquisition?period=${period}`)
       );
+    },
+  });
+};
+
+// -----------------------------
+// DELETE USER
+// -----------------------------
+export const useDeleteUser = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      return await apiRequest(() => api.delete(`/admin/users/${userId}`));
+    },
+    onSuccess: () => {
+      toast.success("User deleted successfully");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (error: Error | AxiosError) => {
+      const errorMessage =
+        (error instanceof AxiosError && error.response?.data?.message) ||
+        error.message ||
+        "Failed to delete user";
+      toast.error(errorMessage);
     },
   });
 };

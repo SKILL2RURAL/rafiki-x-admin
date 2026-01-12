@@ -210,3 +210,15 @@ export const useMRR = ({
     staleTime: 1000 * 60 * 5,
   });
 };
+
+// User Stats Hook
+export const useUserStats = () => {
+  return useQuery({
+    queryKey: ["user-stats"],
+    queryFn: async () => {
+      const result = await apiRequest(() => api.get("/analytics/user-stats"));
+      return result?.data || result || {};
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};

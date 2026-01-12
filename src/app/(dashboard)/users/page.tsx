@@ -84,6 +84,8 @@ const UsersPage = () => {
     }
   };
 
+  function deleteUser() {}
+
   return (
     <div>
       <h1 className="text-[20px] font-bold">Users</h1>
@@ -211,7 +213,10 @@ const UsersPage = () => {
                             Deactivate User
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-[#313131] font-bold mt-3">
+                          <DropdownMenuItem
+                            className="text-[#313131] font-bold mt-3"
+                            onClick={deleteUser}
+                          >
                             Delete User
                           </DropdownMenuItem>
                         </DropdownMenuContent>

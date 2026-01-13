@@ -29,19 +29,19 @@ const UsersMetrics = ({
       <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
         <p className="text-[14px] text-[#A3AED0]">Total Users</p>
         <p className="text-[36px] font-bold text-primary">
-          {userStats.totalUsers ?? 0}
+          {userStats?.totalUsers ?? 0}
         </p>
       </div>
       <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
         <p className="text-[14px] text-[#A3AED0]">Active Users</p>
         <p className="text-[36px] font-bold text-primary">
-          {userStats.activeUsers ?? 0}
+          {userStats?.activeUsers ?? 0}
         </p>
       </div>
       <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
         <p className="text-[14px] text-[#A3AED0]">Deactivated Users</p>
         <p className="text-[36px] font-bold text-primary">
-          {userStats.deactivatedUsers ?? 0}
+          {userStats?.deactivatedUsers ?? 0}
         </p>
       </div>
     </div>

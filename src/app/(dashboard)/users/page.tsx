@@ -4,6 +4,7 @@ import {
   useActivateUser,
   useDeactivateUser,
   useAdminUsers,
+  useDeleteUser,
 } from "@/hook/useUser";
 
 import {
@@ -39,6 +40,7 @@ const UsersPage = () => {
   });
   const activateUser = useActivateUser();
   const deactivateUser = useDeactivateUser();
+  const deleteUserMutation = useDeleteUser();
 
   // Error state
   if (isError) {
@@ -84,7 +86,12 @@ const UsersPage = () => {
     }
   };
 
-  function deleteUser() {}
+  const handleDeleteUser = (userId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      deleteUserMutation.mutate(userId);
+    }
+  };
 
   return (
     <div>
@@ -215,7 +222,7 @@ const UsersPage = () => {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-[#313131] font-bold mt-3"
-                            onClick={deleteUser}
+                            onClick={(e) => handleDeleteUser(item.id, e)}
                           >
                             Delete User
                           </DropdownMenuItem>

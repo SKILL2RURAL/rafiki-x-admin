@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useDebounce } from "use-debounce";
@@ -125,13 +125,19 @@ const UsersPage = () => {
           ))}
         </div>
 
-        <input
-          type="text"
-          placeholder="Search by name or email"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 border border-[#EAECF0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#51A3DA] text-[14px] w-[300px]"
-        />
+        <div className="relative w-[300px]">
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#909090]"
+            size={18}
+          />
+          <input
+            type="text"
+            placeholder="Search by name or email"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-[#EAECF0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#51A3DA] text-[14px]"
+          />
+        </div>
       </div>
 
       {/* Table  */}

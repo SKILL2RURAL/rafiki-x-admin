@@ -11,22 +11,18 @@ export async function GET(
   const cookieStore = await cookies();
 
   const token =
-    cookieStore.get("auth_token")?.value ||
-    cookieStore.get("__session")?.value;
+    cookieStore.get("auth_token")?.value || cookieStore.get("__session")?.value;
 
   const finalToken = token;
 
   try {
-    const response = await fetch(
-      `${BACKEND_API_URL}/api/admin/users/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${finalToken}`,
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      }
-    );
+    const response = await fetch(`${BACKEND_API_URL}/api/admin/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${finalToken}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -38,7 +34,6 @@ export async function GET(
 
     const data = await response.json();
     return NextResponse.json(data, { status: 200 });
-
   } catch (error) {
     console.error("User details API route error:", error);
     return NextResponse.json(
@@ -47,7 +42,6 @@ export async function GET(
     );
   }
 }
-
 
 // ---------------- PATCH: ACTIVATE / DEACTIVATE ----------------
 export async function PATCH(
@@ -58,10 +52,9 @@ export async function PATCH(
 
   const cookieStore = await cookies();
   const token =
-    cookieStore.get("auth_token")?.value ||
-    cookieStore.get("__session")?.value;
+    cookieStore.get("auth_token")?.value || cookieStore.get("__session")?.value;
 
-  const finalToken = token 
+  const finalToken = token;
 
   // Extract action from URL
   const url = new URL(request.url);
@@ -106,8 +99,7 @@ export async function DELETE(
   const { id } = await params;
   const cookieStore = await cookies();
   const token =
-    cookieStore.get("auth_token")?.value ||
-    cookieStore.get("__session")?.value;
+    cookieStore.get("auth_token")?.value || cookieStore.get("__session")?.value;
 
   const finalToken = token;
 
@@ -116,16 +108,13 @@ export async function DELETE(
   }
 
   try {
-    const response = await fetch(
-      `${BACKEND_API_URL}/api/admin/users/${id}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${finalToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${BACKEND_API_URL}/api/admin/users/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${finalToken}`,
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

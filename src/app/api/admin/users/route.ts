@@ -20,12 +20,16 @@ export async function GET(request: NextRequest) {
   const size = searchParams.get("size") || "10";
   const sortBy = searchParams.get("sortBy") || "id";
   const sortDir = searchParams.get("sortDir") || "asc";
+  const search = searchParams.get("search") || "";
 
   const backendUrl = new URL(`${BACKEND_API_URL}/api/admin/users`);
   backendUrl.searchParams.append("page", page);
   backendUrl.searchParams.append("size", size);
   backendUrl.searchParams.append("sortBy", sortBy);
   backendUrl.searchParams.append("sortDir", sortDir);
+  if (search) {
+    backendUrl.searchParams.append("search", search);
+  }
 
   try {
     const response = await fetch(backendUrl.toString(), {

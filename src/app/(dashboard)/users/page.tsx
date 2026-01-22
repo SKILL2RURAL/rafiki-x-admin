@@ -25,18 +25,26 @@ import {
 import { EllipsisVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { useDebounce } from "use-debounce";
 import UsersMetrics from "../../../components/Dashboard/Users/UsersMetrics";
 
 const UsersPage = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const [active, setActive] = React.useState("All");
   const [currentPage, setCurrentPage] = React.useState(0);
   const ITEMS_PER_PAGE = 10;
 
+  // Reset to first page when search changes
+  React.useEffect(() => {
+    setCurrentPage(0);
+  }, [debouncedSearchQuery]);
+
   const { data, isLoading, isError, error } = useAdminUsers({
     page: currentPage,
     size: ITEMS_PER_PAGE,
+    search: debouncedSearchQuery,
   });
   const activateUser = useActivateUser();
   const deactivateUser = useDeactivateUser();
@@ -53,26 +61,16 @@ const UsersPage = () => {
     );
   }
 
-  // Filter by name or email (client-side filtering for search)
+  // Filter by status (client-side filtering)
   let filteredUsers =
     data?.content?.filter((user) => {
-      if (!searchQuery) return true;
-      const q = searchQuery.toLowerCase();
-      return (
-        user.fullName.toLowerCase().includes(q) ||
-        user.email.toLowerCase().includes(q)
-      );
+      if (active === "Active") {
+        return user.status === "active";
+      } else if (active === "Deactivated") {
+        return user.status === "deactivated";
+      }
+      return true; // "All" shows everything
     }) ?? [];
-
-  // Filter by status (client-side filtering)
-  if (active === "Active") {
-    filteredUsers = filteredUsers.filter((user) => user.status === "active");
-  } else if (active === "Deactivated") {
-    filteredUsers = filteredUsers.filter(
-      (user) => user.status === "deactivated"
-    );
-  }
-  // "All" shows everything
 
   const handlePrevious = () => {
     if (currentPage > 0) {
@@ -103,33 +101,43 @@ const UsersPage = () => {
       {/* Metrics  */}
       <UsersMetrics data={data?.content || []} isLoading={isLoading} />
 
-      {/* filter  */}
-      <div className="flex gap-5 mt-10 bg-[#F4F4F5] rounded-[8px] px-3 py-2 w-fit">
-        {["All", "Active", "Deactivated"].map((item, index) => (
-          <button
-            key={index}
-            className={`${
-              active === item && "border border-[#51A3DA] bg-[#F2F8FC]"
-            } px-5 py-1 rounded-[4px] `}
-            onClick={() => setActive(item)}
-          >
-            <p
-              className={` ${
-                active === item
-                  ? "bg-linear-to-r from-[#51A3DA] to-[#60269E] text-transparent bg-clip-text font-bold"
-                  : "text-[#4D5154] text-[14px]"
-              }`}
+      {/* filter and search */}
+      <div className="flex items-center justify-between gap-5 mt-10">
+        <div className="flex gap-5 bg-[#F4F4F5] rounded-xl px-3 py-2 w-fit">
+          {["All", "Active", "Deactivated"].map((item, index) => (
+            <button
+              key={index}
+              className={`${
+                active === item && "border border-[#51A3DA] bg-[#F2F8FC]"
+              } px-5 py-1 rounded-lg `}
+              onClick={() => setActive(item)}
             >
-              {item}
-            </p>
-          </button>
-        ))}
+              <p
+                className={` ${
+                  active === item
+                    ? "bg-linear-to-r from-[#51A3DA] to-[#60269E] text-transparent bg-clip-text font-bold"
+                    : "text-[#4D5154] text-[14px]"
+                }`}
+              >
+                {item}
+              </p>
+            </button>
+          ))}
+        </div>
+
+        <input
+          type="text"
+          placeholder="Search by name or email"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="px-4 py-2 border border-[#EAECF0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#51A3DA] text-[14px] w-[300px]"
+        />
       </div>
 
       {/* Table  */}
-      <div className="border border-[#EAECF0] rounded-[8px] my-10">
+      <div className="border border-[#EAECF0] rounded-xl my-10">
         <Table>
-          <TableHeader className="bg-[#F9FAFB] border-b border-[#EAECF0] rounded-[8px]">
+          <TableHeader className="bg-[#F9FAFB] border-b border-[#EAECF0] rounded-xl">
             <TableRow className="h-[45px]">
               <TableHead className="text-[#667085]">User ID</TableHead>
               <TableHead className="text-[#667085]">User</TableHead>
@@ -183,14 +191,14 @@ const UsersPage = () => {
                         item.status === "active"
                           ? "bg-[#ECFDF3] text-[#027A48]"
                           : "bg-[#FEF3F2] text-[#B42318]"
-                      } rounded-[16px] px-3 py-1 w-fit capitalize`}
+                      } rounded-2xl px-3 py-1 w-fit capitalize`}
                     >
                       {item.status}
                     </p>
                   </TableCell>
                   <TableCell>
                     <div
-                      className="p-2 border-[#E4E7EC] border rounded-[4px] w-fit cursor-pointer"
+                      className="p-2 border-[#E4E7EC] border rounded-lg w-fit cursor-pointer"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <DropdownMenu>
@@ -241,14 +249,14 @@ const UsersPage = () => {
           </p>
           <div className="flex gap-4">
             <button
-              className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="border border-[#D0D5DD] rounded-xl px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               onClick={handlePrevious}
               disabled={data?.first || currentPage === 0}
             >
               Previous
             </button>
             <button
-              className="border border-[#D0D5DD] rounded-[8px] px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="border border-[#D0D5DD] rounded-xl px-3 py-1 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               onClick={handleNext}
               disabled={
                 data?.last ||

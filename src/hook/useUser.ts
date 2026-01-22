@@ -18,6 +18,19 @@ export interface AdminUser {
   avatarUrl: string | null;
 }
 
+export interface CurrentPlan {
+  subscriptionId: number;
+  plan: string;
+  status: string;
+  billingCycle: string;
+  amount: number;
+  currency: string;
+  startDate: string;
+  endDate: string;
+  autoRenews: boolean;
+  active: boolean;
+}
+
 export interface AdminUserDetail {
   id: number;
   fullName: string;
@@ -25,6 +38,12 @@ export interface AdminUserDetail {
   createdAt: string;
   avatarUrl: string | null;
   status?: string;
+  gender?: string;
+  country?: string;
+  ageGroup?: string;
+  lastLoginAt?: string | null;
+  emailVerified?: boolean;
+  currentPlan?: CurrentPlan;
 }
 
 export interface SendMessagePayload {
@@ -55,13 +74,30 @@ interface RawUser {
 }
 
 interface RawUserDetail {
-  id: string;
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
   createdAt: string;
   profilePhoto: string;
   status?: string;
+  gender?: string;
+  country?: string;
+  ageGroup?: string;
+  lastLoginAt?: string | null;
+  emailVerified?: boolean;
+  currentPlan?: {
+    subscriptionId: number;
+    plan: string;
+    status: string;
+    billingCycle: string;
+    amount: number;
+    currency: string;
+    startDate: string;
+    endDate: string;
+    autoRenews: boolean;
+    active: boolean;
+  };
 }
 
 // Paginated Users Response
@@ -81,20 +117,25 @@ export const useAdminUsers = ({
   size = 10,
   sortBy = "id",
   sortDir = "asc",
+  search = "",
 }: {
   page?: number;
   size?: number;
   sortBy?: string;
   sortDir?: "asc" | "desc";
+  search?: string;
 } = {}) => {
   return useQuery<PaginatedUsersResponse>({
-    queryKey: ["admin-users", { page, size, sortBy, sortDir }],
+    queryKey: ["admin-users", { page, size, sortBy, sortDir, search }],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", page.toString());
       params.append("size", size.toString());
       params.append("sortBy", sortBy);
       params.append("sortDir", sortDir);
+      if (search) {
+        params.append("search", search);
+      }
 
       // apiRequest returns the response body: { success, message, data }
       const response = await apiRequest<
@@ -157,6 +198,12 @@ export const useAdminUser = (id: string | number) => {
         createdAt: u.createdAt,
         avatarUrl: u.profilePhoto,
         status: u.status,
+        gender: u.gender,
+        country: u.country,
+        ageGroup: u.ageGroup,
+        lastLoginAt: u.lastLoginAt,
+        emailVerified: u.emailVerified,
+        currentPlan: u.currentPlan,
       };
     },
     enabled: Boolean(id),
@@ -275,5 +322,92 @@ export const useDeleteUser = () => {
         "Failed to delete user";
       toast.error(errorMessage);
     },
+  });
+};
+// BILLING TYPES
+export interface Billing {
+  id: number;
+  paymentId: string;
+  paymentDate: string;
+  plan: string;
+  amount: number;
+  currency: string;
+  status: string;
+  invoiceUrl: string | null;
+}
+
+export interface PaginatedBillingsResponse {
+  content: Billing[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
+// FETCH USER BILLINGS
+export const useUserBillings = (
+  userId: string | number,
+  page: number = 0,
+  size: number = 10
+) => {
+  return useQuery<PaginatedBillingsResponse>({
+    queryKey: ["user-billings", userId, page, size],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("size", size.toString());
+
+      const response = await apiRequest<PaginatedBillingsResponse>(
+        () => api.get(`/admin/users/${userId}/billings?${params.toString()}`)
+      );
+
+      return (
+        response || {
+          content: [],
+          page: 0,
+          size: 10,
+          totalElements: 0,
+          totalPages: 0,
+          first: true,
+          last: true,
+        }
+      );
+    },
+    enabled: Boolean(userId),
+  });
+};
+
+// Legacy hook for backward compatibility (deprecated - use useUserBillings instead)
+export interface SubscriptionHistory {
+  subscriptionId: number;
+  plan: string;
+  status: string;
+  billingCycle: string;
+  startDate: string | null;
+  endDate: string | null;
+  cancelledAt: string | null;
+  amount: number;
+  currency: string;
+  limits: any;
+  currentUsage: any;
+  autoRenews: boolean;
+  nextBillingDate: string | null;
+  active: boolean;
+  cancelled: boolean;
+}
+
+export const useSubscriptionHistory = (userId: string | number) => {
+  return useQuery<SubscriptionHistory[]>({
+    queryKey: ["subscription-history", userId],
+    queryFn: async () => {
+      const response = await apiRequest<ApiResponse<SubscriptionHistory[]>>(
+        () => api.get(`/admin/users/${userId}/subscription/history`)
+      );
+
+      return response?.data ?? [];
+    },
+    enabled: Boolean(userId),
   });
 };

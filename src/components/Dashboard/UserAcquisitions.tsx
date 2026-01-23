@@ -17,21 +17,52 @@ export default function UserAcquisitions() {
   const currentMonth = (new Date().getMonth() + 1).toString();
 
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [activeView, setActiveView] = useState<"year" | "month">("year");
 
   const { data: userAcquisitions, isLoading } = useGetUserAquisitions({
     period: activeView,
     year: selectedYear,
-    month: activeView === "month" ? currentMonth : undefined,
+    month: activeView === "month" ? selectedMonth : undefined,
   });
 
-  if (isLoading) {
-    return <Skeleton className="h-[350px] w-full rounded-lg" />;
-  }
-
-  if (!userAcquisitions) {
+  if (!userAcquisitions && !isLoading) {
     return null;
   }
+
+  // Generate period label based on selected period
+  const getPeriodLabel = () => {
+    if (activeView === "year") {
+      if (selectedYear === currentYear) {
+        return "this year";
+      }
+      return `in ${selectedYear}`;
+    } else {
+      // Month view
+      const isCurrentMonth =
+        selectedYear === currentYear && selectedMonth === currentMonth;
+      if (isCurrentMonth) {
+        return "this month";
+      }
+      // Get month name
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      const monthName = monthNames[parseInt(selectedMonth) - 1] || "";
+      return `in ${monthName} ${selectedYear}`;
+    }
+  };
 
   return (
     <div className="w-full">
@@ -46,7 +77,7 @@ export default function UserAcquisitions() {
               <span className="text-5xl font-bold text-indigo-900">
                 {userAcquisitions?.totalSignUps || 0}
               </span>
-              <span className="text-gray-400 text-lg">Sign Ups</span>
+              <span className="text-gray-400 text-lg">{getPeriodLabel()}</span>
             </div>
           </div>
 
@@ -75,63 +106,98 @@ export default function UserAcquisitions() {
               </button>
             </div>
 
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="px-4 py-2 bg-gray-100 border-none rounded-lg text-gray-700 font-medium cursor-pointer appearance-none pr-10"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "right 12px center",
-              }}
-            >
-              <option>{currentYear}</option>
-              <option>{(parseInt(currentYear) - 1).toString()}</option>
-              <option>{(parseInt(currentYear) - 2).toString()}</option>
-            </select>
+            {activeView === "month" ? (
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="px-4 py-2 bg-gray-100 border-none rounded-lg text-gray-700 font-medium cursor-pointer appearance-none pr-10"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 12px center",
+                }}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
+                  const monthName = new Date(2000, month - 1).toLocaleString(
+                    "default",
+                    { month: "long" }
+                  );
+                  return (
+                    <option key={month} value={month.toString()}>
+                      {monthName}
+                    </option>
+                  );
+                })}
+              </select>
+            ) : (
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="px-4 py-2 bg-gray-100 border-none rounded-lg text-gray-700 font-medium cursor-pointer appearance-none pr-10"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 12px center",
+                }}
+              >
+                <option>{currentYear}</option>
+                <option>{(parseInt(currentYear) - 1).toString()}</option>
+                <option>{(parseInt(currentYear) - 2).toString()}</option>
+              </select>
+            )}
           </div>
         </div>
 
         {/* Chart */}
         <div className="h-[350px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={userAcquisitions?.dataPoints}
-              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
-            >
-              <defs>
-                <linearGradient id="barGradient" x1="0.4" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                  <stop offset="50%" stopColor="#60269E" stopOpacity={1} />
-                  {/* <stop offset="100%" stopColor="#8b5cf6" stopOpacity={1} /> */}
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="0"
-                stroke="#f0f0f0"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="label"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9ca3af", fontSize: 14 }}
-                dy={10}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9ca3af", fontSize: 14 }}
-                // tickFormatter={(value) => `${value / 1000}k`}
-              />
-              <Bar
-                dataKey="count"
-                fill="url(#barGradient)"
-                radius={[50, 50, 0, 0]}
-                maxBarSize={30}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          {isLoading ? (
+            <Skeleton className="h-[300px] w-full rounded-lg" />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={userAcquisitions?.dataPoints}
+                margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="barGradient"
+                    x1="0.4"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+                    <stop offset="50%" stopColor="#60269E" stopOpacity={1} />
+                    {/* <stop offset="100%" stopColor="#8b5cf6" stopOpacity={1} /> */}
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="0"
+                  stroke="#f0f0f0"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="label"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#9ca3af", fontSize: 14 }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#9ca3af", fontSize: 14 }}
+                  // tickFormatter={(value) => `${value / 1000}k`}
+                />
+                <Bar
+                  dataKey="count"
+                  fill="url(#barGradient)"
+                  radius={[50, 50, 0, 0]}
+                  maxBarSize={30}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>

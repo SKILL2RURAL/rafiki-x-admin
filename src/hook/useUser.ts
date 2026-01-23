@@ -265,6 +265,33 @@ export const useActivateUser = () => {
 };
 
 // -----------------------------
+// CANCEL SUBSCRIPTION
+// -----------------------------
+export const useCancelSubscription = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      return await apiRequest(() =>
+        api.post(`/admin/users/${userId}/subscription/cancel`)
+      );
+    },
+    onSuccess: () => {
+      toast.success("Subscription cancelled successfully");
+      qc.invalidateQueries({ queryKey: ["admin-user"] });
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (error: Error | AxiosError) => {
+      const errorMessage =
+        (error instanceof AxiosError && error.response?.data?.message) ||
+        error.message ||
+        "Failed to cancel subscription";
+      toast.error(errorMessage);
+    },
+  });
+};
+
+// -----------------------------
 // SEND MESSAGE
 // -----------------------------
 export const useSendMessage = () => {

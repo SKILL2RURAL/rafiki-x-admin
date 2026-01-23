@@ -23,6 +23,7 @@ import {
   useDeactivateUser,
   AdminUserDetail,
   useUserBillings,
+  useCancelSubscription,
 } from "@/hook/useUser";
 
 const UserDetailsPage = () => {
@@ -42,6 +43,7 @@ const UserDetailsPage = () => {
   };
   const activateUser = useActivateUser();
   const deactivateUser = useDeactivateUser();
+  const cancelSubscription = useCancelSubscription();
   const { data: billingsData, isLoading: isBillingsLoading } = useUserBillings(
     userId,
     currentPage,
@@ -108,10 +110,10 @@ const UserDetailsPage = () => {
 
       <div className="grid grid-cols-2 gap-10">
         {/* USER INFORMATION */}
-        <div className="space-y-2">
+        <div className="space-y-2 flex flex-col">
           <h4 className="text-[18px] font-semibold">User Information</h4>
 
-          <div className="shadow-md shadow-[#7090B01A] p-5 rounded-lg">
+          <div className="shadow-md shadow-[#7090B01A] p-5 rounded-lg flex-1">
             <div className="flex justify-between items-center gap-5">
               <div className="flex items-center gap-3">
                 <Avatar className="size-12 border-[1.5px] border-[#51A3DA]">
@@ -145,6 +147,7 @@ const UserDetailsPage = () => {
               <InfoRow label="User ID" value={user.id} />
               <InfoRow label="Email Address" value={user.email} />
               <InfoRow label="Gender" value={user.gender || "Not provided"} />
+              <InfoRow label="Age Group" value={user.ageGroup || "Not provided"} />
               <InfoRow label="Country" value={user.country || "Not provided"} />
               <InfoRow
                 label="Last Login"
@@ -158,10 +161,10 @@ const UserDetailsPage = () => {
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 flex flex-col">
           <h4 className="text-[18px] font-semibold">Current Plan</h4>
 
-          <div className="shadow-md shadow-[#7090B01A] p-5 rounded-lg">
+          <div className="shadow-md shadow-[#7090B01A] p-5 rounded-lg flex-1">
             {user.currentPlan ? (
               <>
                 <div className="font-semibold">
@@ -186,9 +189,27 @@ const UserDetailsPage = () => {
                   />
                   <button
                     type="button"
-                    className="font-bold text-[14px] bg-linear-to-r from-[#51A3DA] to-[#60269E] py-3 px-4 rounded-[10px] text-white w-full"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to cancel this subscription?"
+                        )
+                      ) {
+                        cancelSubscription.mutate(user.id);
+                      }
+                    }}
+                    disabled={
+                      cancelSubscription.isPending ||
+                      user.currentPlan.status === "CANCELLED" ||
+                      !user.currentPlan.active
+                    }
+                    className="font-bold text-[14px] bg-linear-to-r from-[#51A3DA] to-[#60269E] py-3 px-4 rounded-[10px] text-white w-full disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Cancel Subscription
+                    {cancelSubscription.isPending
+                      ? "Cancelling..."
+                      : user.currentPlan.status === "CANCELLED"
+                      ? "Subscription Cancelled"
+                      : "Cancel Subscription"}
                   </button>
                 </form>
               </>

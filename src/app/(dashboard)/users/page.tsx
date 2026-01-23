@@ -189,7 +189,11 @@ const UsersPage = () => {
                   </TableCell>
                   <TableCell className="text-[14px]">{item.email}</TableCell>
                   <TableCell>
-                    {new Date(item.joinedDate).toLocaleDateString()}
+                    {new Date(item.joinedDate).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
                   </TableCell>
                   <TableCell>
                     <p

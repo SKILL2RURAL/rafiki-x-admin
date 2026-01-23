@@ -50,10 +50,10 @@ const Sidebar = () => {
       : "CN";
 
   return (
-    <div className="w-[var(--sidebar-width)] bg-[#FCFCFC] flex flex-col px-5 justify-between">
+    <div className="w-(--sidebar-width) bg-[#FCFCFC] flex flex-col px-5 justify-between">
       <div>
         {/* Logo  */}
-        <div className="flex gap-3 items-center h-[var(--navbar-height)] mt-8">
+        <div className="flex gap-3 items-center h-(--navbar-height) mt-8">
           <Image
             src={"/icons/logo-gradient.svg"}
             alt="Rafiki X"
@@ -61,7 +61,7 @@ const Sidebar = () => {
             height={40}
             fetchPriority="high"
           />
-          <p className="font-mullish font-bold text-[24px] bg-gradient-to-r from-[#51A3DA] to-[#60269E] bg-clip-text text-transparent">
+          <p className="font-mullish font-bold text-[24px] bg-linear-to-r from-[#51A3DA] to-[#60269E] bg-clip-text text-transparent">
             RafikiX
           </p>
         </div>
@@ -81,8 +81,8 @@ const Sidebar = () => {
               <li
                 className={`flex gap-[11px] items-center px-[10px] h-[40px] text-[16px] ${
                   pathname.includes(item.href)
-                    ? "bg-gradient-to-r from-[#51A3DA] to-[#60269E] rounded-[8px] text-white font-bold"
-                    : "text-[#808990] font-[400]"
+                    ? "bg-linear-to-r from-[#51A3DA] to-[#60269E] rounded-[8px] text-white font-bold"
+                    : "text-[#808990] font-normal"
                 }`}
               >
                 {item.icon}

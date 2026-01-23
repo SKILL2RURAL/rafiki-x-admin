@@ -22,17 +22,47 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 
+const REMEMBER_ME_STORAGE_KEY = "rafiki_admin_remember_me";
+
 export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const form = useForm<LoginSchemaData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
+  // Initialize rememberMe state by checking localStorage
+  const [rememberMe, setRememberMe] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedCredentials = localStorage.getItem(REMEMBER_ME_STORAGE_KEY);
+      return !!savedCredentials;
+    }
+    return false;
+  });
+
+  // Initialize form with saved credentials if they exist
+  const getInitialValues = (): LoginSchemaData => {
+    if (typeof window !== "undefined") {
+      const savedCredentials = localStorage.getItem(REMEMBER_ME_STORAGE_KEY);
+      if (savedCredentials) {
+        try {
+          const { email, password } = JSON.parse(savedCredentials);
+          return {
+            email: email || "",
+            password: password || "",
+          };
+        } catch (error) {
+          console.error("Error parsing saved credentials:", error);
+        }
+      }
+    }
+    return {
       email: "",
       password: "",
-    },
+    };
+  };
+
+  const form = useForm<LoginSchemaData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: getInitialValues(),
   });
 
   async function onSubmit(values: LoginSchemaData) {
@@ -45,6 +75,20 @@ export function LoginForm() {
       });
 
       if (response.ok) {
+        // Save credentials if remember me is checked
+        if (rememberMe && typeof window !== "undefined") {
+          localStorage.setItem(
+            REMEMBER_ME_STORAGE_KEY,
+            JSON.stringify({
+              email: values.email,
+              password: values.password,
+            })
+          );
+        } else if (!rememberMe && typeof window !== "undefined") {
+          // Clear saved credentials if remember me is unchecked
+          localStorage.removeItem(REMEMBER_ME_STORAGE_KEY);
+        }
+
         router.push("/");
         router.refresh();
       } else {
@@ -119,7 +163,10 @@ export function LoginForm() {
         {/* Remember + Forgot Password */}
         <div className="text-[12px] flex justify-between items-center font-satoshi-regular">
           <div className="flex items-center gap-2">
-            <Checkbox />
+            <Checkbox
+              checked={rememberMe}
+              onCheckedChange={(checked) => setRememberMe(checked === true)}
+            />
             <p>Remember me</p>
           </div>
           <Link href="/">Forgot Password?</Link>

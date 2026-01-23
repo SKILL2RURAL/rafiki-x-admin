@@ -43,7 +43,7 @@ const AnalyticsMetrics = ({
         </p>
       </div>
       <div className="border-[0.5px] rounded-[8px] border-[#D2D5DA] p-5">
-        <p className="text-[14px] text-[#A3AED0]">New Signups</p>
+        <p className="text-[14px] text-[#A3AED0]">New Signups (last 30 days)</p>
         <p className="text-[36px] font-bold text-primary">
           {data?.summary.newSignups || 0}
         </p>

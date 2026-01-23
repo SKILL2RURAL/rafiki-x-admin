@@ -26,6 +26,10 @@ const BubbleChart = ({
 
   if (Array.isArray(data)) {
     chartData = data
+      .filter((item) => {
+        const name = item.name?.toLowerCase() || "";
+        return name === "male" || name === "female";
+      })
       .map((item) => ({
         name: item.name,
         percentage: Math.round(item.percentage),
@@ -33,6 +37,10 @@ const BubbleChart = ({
       .sort((a, b) => b.percentage - a.percentage);
   } else if (data && typeof data === "object" && !Array.isArray(data)) {
     chartData = Object.entries(data)
+      .filter(([key]) => {
+        const name = key.toLowerCase();
+        return name === "male" || name === "female";
+      })
       .sort(([, a], [, b]) => {
         const valA =
           typeof a === "number"

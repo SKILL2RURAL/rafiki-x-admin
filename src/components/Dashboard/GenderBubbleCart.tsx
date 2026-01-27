@@ -1,5 +1,6 @@
 import React from "react";
 import { Skeleton } from "../ui/skeleton";
+import ChartEmptyState from "./Analytics/ChartEmptyState";
 
 interface BubbleChartDataItem {
   name: string;
@@ -26,10 +27,6 @@ const BubbleChart = ({
 
   if (Array.isArray(data)) {
     chartData = data
-      .filter((item) => {
-        const name = item.name?.toLowerCase() || "";
-        return name === "male" || name === "female";
-      })
       .map((item) => ({
         name: item.name,
         percentage: Math.round(item.percentage),
@@ -37,10 +34,6 @@ const BubbleChart = ({
       .sort((a, b) => b.percentage - a.percentage);
   } else if (data && typeof data === "object" && !Array.isArray(data)) {
     chartData = Object.entries(data)
-      .filter(([key]) => {
-        const name = key.toLowerCase();
-        return name === "male" || name === "female";
-      })
       .sort(([, a], [, b]) => {
         const valA =
           typeof a === "number"
@@ -67,6 +60,21 @@ const BubbleChart = ({
 
   if (isLoading) {
     return <Skeleton className="h-[600px] w-full rounded-lg" />;
+  }
+
+  if (!firstItem) {
+    return (
+      <div className="w-full max-w-3xl mx-auto p-8 bg-white rounded-2xl shadow-sm">
+        <div className="mb-2">
+          <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
+          <p className="text-gray-500 mt-1">{description}</p>
+        </div>
+
+        <div className="h-96 mt-8">
+          <ChartEmptyState />
+        </div>
+      </div>
+    );
   }
 
   return (

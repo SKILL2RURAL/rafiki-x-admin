@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
+import ChartEmptyState from "./ChartEmptyState";
 
 export default function NewSubscribers() {
   const currentYear = new Date().getFullYear().toString();
@@ -33,10 +34,7 @@ export default function NewSubscribers() {
   if (isLoading) {
     return <Skeleton className="h-[400px] w-full rounded-lg" />;
   }
-
-  if (!newSubscribers) {
-    return null;
-  }
+  const hasChartData = (newSubscribers?.dataPoints?.length || 0) > 0;
 
   return (
     <div className="w-full">
@@ -122,52 +120,59 @@ export default function NewSubscribers() {
 
         {/* Chart */}
         <div className="h-[350px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={newSubscribers?.dataPoints}
-              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
-            >
-              <defs>
-                <linearGradient
-                  id="subscriberGradient"
-                  x1="0.4"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                  <stop offset="50%" stopColor="#60269E" stopOpacity={1} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="0"
-                stroke="#f0f0f0"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="label"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9ca3af", fontSize: 14 }}
-                dy={10}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9ca3af", fontSize: 14 }}
-                tickFormatter={(value) => {
-                  if (value >= 1000) return `${value / 1000}k`;
-                  return value.toString();
-                }}
-              />
-              <Bar
-                dataKey="count"
-                fill="url(#subscriberGradient)"
-                radius={[50, 50, 0, 0]}
-                maxBarSize={30}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          {!hasChartData ? (
+            <ChartEmptyState
+              title="No subscriber information"
+              description="There’s no subscriber activity for this period yet. Try changing Month/Year or check back later."
+            />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={newSubscribers?.dataPoints}
+                margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="subscriberGradient"
+                    x1="0.4"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+                    <stop offset="50%" stopColor="#60269E" stopOpacity={1} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="0"
+                  stroke="#f0f0f0"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="label"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#9ca3af", fontSize: 14 }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#9ca3af", fontSize: 14 }}
+                  tickFormatter={(value) => {
+                    if (value >= 1000) return `${value / 1000}k`;
+                    return value.toString();
+                  }}
+                />
+                <Bar
+                  dataKey="count"
+                  fill="url(#subscriberGradient)"
+                  radius={[50, 50, 0, 0]}
+                  maxBarSize={30}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>

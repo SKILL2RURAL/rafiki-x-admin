@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { Skeleton } from "../ui/skeleton";
 import { LabelContentType } from "recharts/types/component/Label";
+import ChartEmptyState from "./Analytics/ChartEmptyState";
 
 interface AgeGroupDataEntry {
   count: number;
@@ -74,6 +75,8 @@ export default function AgeGroupAnalysis({
     return <Skeleton className="h-[600px] w-full rounded-lg" />;
   }
 
+  const hasData = (data?.length || 0) > 0 && data.some((d) => (d.count || 0) > 0);
+
   return (
     <div className="w-full flex items-center justify-center">
       <div className="bg-white rounded-3xl shadow-sm p-12 max-w-4xl w-full">
@@ -88,42 +91,50 @@ export default function AgeGroupAnalysis({
 
         {/* Chart */}
         <div className="h-96">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              layout="vertical"
-              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-              <XAxis
-                type="number"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9ca3af", fontSize: 14 }}
-                // ticks={[0, 10, 20, 50, 100, 200, 500, 1000]}
-                tickFormatter={(value) => (value === 1000 ? "1K" : value)}
-              />
-              <YAxis
-                type="category"
-                dataKey="label"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#1f2937", fontSize: 16, fontWeight: 400 }}
-                width={100}
-              />
-              <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={32}>
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-                <LabelList
-                  dataKey="count"
-                  content={CustomLabel as LabelContentType}
+          {!hasData ? (
+            <ChartEmptyState
+              title="No age group data"
+              description="There’s no information to display for age groups yet. Check back later."
+            />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={data}
+                layout="vertical"
+                margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+              >
+                <XAxis
+                  type="number"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#9ca3af", fontSize: 14 }}
+                  // ticks={[0, 10, 20, 50, 100, 200, 500, 1000]}
+                  tickFormatter={(value) => (value === 1000 ? "1K" : value)}
                 />
-                {/* <LabelList dataKey="count" /> */}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                <YAxis
+                  type="category"
+                  dataKey="label"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#1f2937", fontSize: 16, fontWeight: 400 }}
+                  width={100}
+                />
+                <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={32}>
+                  {data.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                  <LabelList
+                    dataKey="count"
+                    content={CustomLabel as LabelContentType}
+                  />
+                  {/* <LabelList dataKey="count" /> */}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>

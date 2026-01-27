@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LabelContentType } from "recharts/types/component/Label";
+import ChartEmptyState from "./ChartEmptyState";
 
 interface CustomLabelProps extends SVGProps<SVGTextElement> {
   x?: string | number;
@@ -72,18 +73,7 @@ export default function SubscriptionModels() {
       { label: "Yearly", count: yearly },
     ].filter((item) => item.count > 0);
   }
-
-  // Fallback to subscriptionModels if available
-  if (chartData.length === 0) {
-    chartData = [
-      { label: "Monthly", count: 100 },
-      { label: "Yearly", count: 200 },
-    ];
-  }
-
-  if (chartData.length === 0) {
-    return null;
-  }
+  const hasData = chartData.length > 0;
 
   return (
     <div className="w-full flex items-center justify-center">
@@ -101,45 +91,52 @@ export default function SubscriptionModels() {
 
         {/* Chart */}
         <div className="h-[150px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-            >
-              <XAxis
-                type="number"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9ca3af", fontSize: 14 }}
-                tickFormatter={(value) => {
-                  if (value === 1000) return "1K";
-                  if (value >= 1000) return `${value / 1000}K`;
-                  return value.toString();
-                }}
-              />
-              <YAxis
-                type="category"
-                dataKey="label"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#1f2937", fontSize: 16, fontWeight: 400 }}
-                width={100}
-              />
-              <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={32}>
-                {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-                <LabelList
-                  dataKey="count"
-                  content={CustomLabel as LabelContentType}
+          {!hasData ? (
+            <ChartEmptyState
+              title="No subscription model data"
+              description="There’s no billing breakdown information available yet. Check back later."
+            />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={chartData}
+                layout="vertical"
+                margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+              >
+                <XAxis
+                  type="number"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#9ca3af", fontSize: 14 }}
+                  tickFormatter={(value) => {
+                    if (value === 1000) return "1K";
+                    if (value >= 1000) return `${value / 1000}K`;
+                    return value.toString();
+                  }}
                 />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                <YAxis
+                  type="category"
+                  dataKey="label"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#1f2937", fontSize: 16, fontWeight: 400 }}
+                  width={100}
+                />
+                <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={32}>
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                  <LabelList
+                    dataKey="count"
+                    content={CustomLabel as LabelContentType}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import {
   Tooltip,
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
+import ChartEmptyState from "./ChartEmptyState";
 
 export default function MRRChart() {
   const currentYear = new Date().getFullYear().toString();
@@ -27,18 +28,15 @@ export default function MRRChart() {
     return <Skeleton className="h-[400px] w-full rounded-lg" />;
   }
 
-  if (!mrrData || !mrrData.dataPoints || mrrData.dataPoints.length === 0) {
-    return null;
-  }
-
+  const hasChartData = (mrrData?.dataPoints?.length || 0) > 0;
   // Transform dataPoints to use 'value' for the chart (recharts expects 'value')
-  const chartData = mrrData.dataPoints.map((point) => ({
+  const chartData = (mrrData?.dataPoints || []).map((point) => ({
     label: point.label,
     value: point.amount,
   }));
 
-  const currency = mrrData.currency || "NGN";
-  const totalRevenue = mrrData.totalRevenue || 0;
+  const currency = mrrData?.currency || "NGN";
+  const totalRevenue = mrrData?.totalRevenue || 0;
 
   return (
     <div className="w-full">
@@ -106,63 +104,70 @@ export default function MRRChart() {
 
         {/* Chart */}
         <div className="h-[350px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
-            >
-              <defs>
-                <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#60269E" stopOpacity={1} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="0"
-                stroke="#f0f0f0"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="label"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9ca3af", fontSize: 14 }}
-                dy={10}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9ca3af", fontSize: 14 }}
-                tickFormatter={(value) => {
-                  if (value >= 1000000) return `${value / 1000000}M`;
-                  if (value >= 1000) return `${value / 1000}K`;
-                  return value.toString();
-                }}
-              />
-              <Tooltip
-                formatter={(value: number) => {
-                  if (value >= 1000000)
-                    return `${currency} ${(value / 1000000).toFixed(1)}M`;
-                  if (value >= 1000)
-                    return `${currency} ${(value / 1000).toFixed(1)}K`;
-                  return `${currency} ${value.toLocaleString()}`;
-                }}
-                contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="url(#mrrGradient)"
-                strokeWidth={3}
-                dot={{ fill: "#60269E", r: 5 }}
-                activeDot={{ r: 7 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {!hasChartData ? (
+            <ChartEmptyState
+              title="No MRR information"
+              description="There’s no MRR data available for this period yet. Try changing the year or check back later."
+            />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
+              >
+                <defs>
+                  <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#60269E" stopOpacity={1} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="0"
+                  stroke="#f0f0f0"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="label"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#9ca3af", fontSize: 14 }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#9ca3af", fontSize: 14 }}
+                  tickFormatter={(value) => {
+                    if (value >= 1000000) return `${value / 1000000}M`;
+                    if (value >= 1000) return `${value / 1000}K`;
+                    return value.toString();
+                  }}
+                />
+                <Tooltip
+                  formatter={(value: number) => {
+                    if (value >= 1000000)
+                      return `${currency} ${(value / 1000000).toFixed(1)}M`;
+                    if (value >= 1000)
+                      return `${currency} ${(value / 1000).toFixed(1)}K`;
+                    return `${currency} ${value.toLocaleString()}`;
+                  }}
+                  contentStyle={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="url(#mrrGradient)"
+                  strokeWidth={3}
+                  dot={{ fill: "#60269E", r: 5 }}
+                  activeDot={{ r: 7 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { AnalyticsOverview } from "@/hook/useAnalytics";
 import React from "react";
 import WorldMap from "../WorldMap";
 import { Skeleton } from "@/components/ui/skeleton";
+import ChartEmptyState from "./ChartEmptyState";
 
 const ActiveUsers = ({
   data,
@@ -13,6 +14,10 @@ const ActiveUsers = ({
   if (isLoading) {
     return <Skeleton className="h-[600px] w-full rounded-[20px] mt-10" />;
   }
+
+  const totalActive = data?.total || 0;
+  const topLocations = data?.topLocations || [];
+  const hasTopLocations = topLocations.length > 0;
 
   return (
     <div className="border border-[#EAECF0] rounded-[20px] p-5 mt-10">
@@ -33,16 +38,23 @@ const ActiveUsers = ({
         <div className="col-span-4 border-l px-8">
           <p className="text-sm text-[#A3AED0]">Active Users </p>
           <p className="text-[27px] text-[#101828] font-semibold mb-7">
-            {data?.total || 0}
+            {totalActive}
           </p>
 
           <div>
             <p className="text-[#2B3674] text-sm font-semibold mb-5">
               Top Location
             </p>
-            <div className="space-y-[4px]">
-              {data &&
-                data?.topLocations.map((item, index) => (
+            {!hasTopLocations ? (
+              <div className="h-[220px]">
+                <ChartEmptyState
+                  title="No active user information"
+                  description="There’s no active user/location data available yet. Check back later."
+                />
+              </div>
+            ) : (
+              <div className="space-y-[4px]">
+                {topLocations.map((item, index) => (
                   <div key={index}>
                     <p className="text-[13px] font-medium mb-2">
                       {item.country}
@@ -60,7 +72,8 @@ const ActiveUsers = ({
                     </div>
                   </div>
                 ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

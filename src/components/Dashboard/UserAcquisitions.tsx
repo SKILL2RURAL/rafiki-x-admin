@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { Skeleton } from "../ui/skeleton";
+import ChartEmptyState from "./Analytics/ChartEmptyState";
 
 export default function UserAcquisitions() {
   const currentYear = new Date().getFullYear().toString();
@@ -25,10 +26,7 @@ export default function UserAcquisitions() {
     year: selectedYear,
     month: activeView === "month" ? selectedMonth : undefined,
   });
-
-  if (!userAcquisitions && !isLoading) {
-    return null;
-  }
+  const hasChartData = (userAcquisitions?.dataPoints?.length || 0) > 0;
 
   // Generate period label based on selected period
   const getPeriodLabel = () => {
@@ -152,6 +150,11 @@ export default function UserAcquisitions() {
         <div className="h-[350px]">
           {isLoading ? (
             <Skeleton className="h-[300px] w-full rounded-lg" />
+          ) : !hasChartData ? (
+            <ChartEmptyState
+              title="No user acquisition data"
+              description="There’s no information for this period yet. Try changing Month/Year or check back later."
+            />
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart

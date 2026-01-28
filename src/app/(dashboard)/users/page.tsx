@@ -167,7 +167,7 @@ const UsersPage = () => {
               filteredUsers.map((item) => (
                 <TableRow
                   key={item.id}
-                  className="h-[70px] text-[14px] cursor-pointer hover:bg-[#F9FAFB]"
+                  className="h-[70px] text-[14px] cursor-pointer hover:bg-gray-100"
                   onClick={() => router.push(`/users/${item.id}`)}
                 >
                   <TableCell>

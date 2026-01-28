@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   try {
-    const res = await fetch(`${BACKEND_API_URL}/api/admin/users`, {
+    const res = await fetch(`${BACKEND_API_URL}/api/admin/admins`, {
       method: "GET",
       headers: {
         authorization: `Bearer ${token}`,

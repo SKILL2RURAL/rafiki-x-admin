@@ -126,7 +126,7 @@ export default function TeamPage() {
       <div className="flex gap-5 items-center mt-6 text-sm text-gray-600">
         <p>{/* Page {currentPage} of {totalPages || 1} */}</p>
 
-        <div className="flex mx-auto gap-2">
+        {/* <div className="flex mx-auto gap-2">s
           <button
             // onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -135,7 +135,7 @@ export default function TeamPage() {
             &lt;
           </button>
 
-          {/* {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
               onClick={() => handlePageChange(page)}
@@ -147,7 +147,7 @@ export default function TeamPage() {
             >
               {page}
             </button>
-          ))} */}
+          ))}
 
           <button
             // onClick={() => handlePageChange(currentPage + 1)}
@@ -156,7 +156,7 @@ export default function TeamPage() {
           >
             &gt;
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

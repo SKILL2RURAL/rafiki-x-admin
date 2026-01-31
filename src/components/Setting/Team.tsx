@@ -36,7 +36,7 @@ export default function TeamPage() {
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-4">
-            <Button className="px-4 py-2 h-[38px] w-[147px] rounded-[8px] text-white bg-gradient">
+            <Button className="px-4 py-2 h-[38px] w-[147px] rounded-xl text-white bg-gradient">
               <Image src={download} alt="download" className="w-5 h-5 mr-2" />
               <span>Export CSV</span>
             </Button>

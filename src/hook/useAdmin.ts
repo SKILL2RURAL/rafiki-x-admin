@@ -14,7 +14,7 @@ export const useAdmins = () => {
   return useQuery({
     queryKey: ["admins"],
     queryFn: async () => {
-      const res = await fetch("/api/team/admins");
+      const res = await fetch("/api/team/admins?sortDir=desc");
 
       if (!res.ok) {
         throw new Error("Failed to fetch admins");

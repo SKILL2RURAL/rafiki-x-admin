@@ -24,7 +24,7 @@ const SettingsPage = () => {
 
   return (
     <div>
-      <div className="w-[355px] h-[52px] rounded-[8px] bg-[#F4F4F5] flex items-center justify-between gap-5 px-4 mb-8">
+      <div className="w-[355px] h-[52px] rounded-xl bg-[#F4F4F5] flex items-center justify-between gap-5 px-4 mb-8">
         {/* Tabs  */}
         {["profile", "password", "team"].map((tabItem) => (
           <div
@@ -37,7 +37,7 @@ const SettingsPage = () => {
             }}
             className={
               tab === tabItem
-                ? "w-full h-[36px] rounded-[8px] bg-[#F2F8FC] text-center font-bold  bg-linear-to-r from-[#51A3DA] to-[#60269E] bg-clip-text text-transparent border border-[#51A3DA] cursor-pointer"
+                ? "w-full h-9 rounded-xl bg-[#F2F8FC] text-center font-bold  bg-linear-to-r from-[#51A3DA] to-[#60269E] bg-clip-text text-transparent border border-[#51A3DA] cursor-pointer"
                 : "cursor-pointer"
             }
             onClick={() => {

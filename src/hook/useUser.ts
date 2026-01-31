@@ -116,7 +116,7 @@ export const useAdminUsers = ({
   page = 0,
   size = 10,
   sortBy = "id",
-  sortDir = "asc",
+  sortDir = "desc",
   search = "",
 }: {
   page?: number;
@@ -386,8 +386,8 @@ export const useUserBillings = (
       params.append("page", page.toString());
       params.append("size", size.toString());
 
-      const response = await apiRequest<PaginatedBillingsResponse>(
-        () => api.get(`/admin/users/${userId}/billings?${params.toString()}`)
+      const response = await apiRequest<PaginatedBillingsResponse>(() =>
+        api.get(`/admin/users/${userId}/billings?${params.toString()}`)
       );
 
       return (

@@ -13,7 +13,7 @@ export default function SubscriptionUsers() {
   // Transform subscription data to bubble chart format
   const chartData = [
     {
-      name: "Free User",
+      name: "Free Users",
       percentage: subscriptionUsers.freeUsers?.percentage || 0,
     },
     {

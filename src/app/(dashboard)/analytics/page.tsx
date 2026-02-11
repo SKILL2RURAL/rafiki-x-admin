@@ -40,6 +40,8 @@ const AnalyticsPage = () => {
   const { data: analyticsOverview, isLoading } = useAnalyticsOverview();
   const { data: subscriptionOverview } = useSubscriptionOverview();
 
+  console.log("Analytics Overview:", analyticsOverview);
+
   return (
     <div>
       {/* Metrics  */}
@@ -50,13 +52,13 @@ const AnalyticsPage = () => {
       />
 
       {/* switch button  */}
-      <div className="flex gap-5 mt-10 bg-[#F4F4F5] rounded-[8px] px-3 py-2 w-fit">
+      <div className="flex gap-5 mt-10 bg-[#F4F4F5] rounded-xl px-3 py-2 w-fit">
         {["Users", "Subscriptions"].map((item, index) => (
           <button
             key={index}
             className={`${
               active === item && "border border-[#51A3DA] bg-[#F2F8FC]"
-            } px-5 py-1 rounded-[4px] `}
+            } px-5 py-1 rounded-lg `}
             onClick={() => setActive(item)}
           >
             <p

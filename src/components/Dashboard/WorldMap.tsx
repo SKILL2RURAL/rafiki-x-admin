@@ -8,6 +8,7 @@ import {
   Geography,
   Marker,
 } from "react-simple-maps";
+import { countryCoordinates } from "@/lib/countryCoordinates";
 
 interface GeoGeometry {
   type: string;
@@ -38,25 +39,6 @@ interface Location {
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-const countryCoordinates: { [key: string]: [number, number] } = {
-  Nigeria: [9.082, 8.6753],
-  "United States": [-95.7129, 37.0902],
-  "United Kingdom": [-3.436, 55.3781],
-  Brazil: [-51.9253, -14.235],
-  India: [78.9629, 20.5937],
-  Japan: [138.2529, 36.2048],
-  Australia: [133.7751, -25.2744],
-  Germany: [10.4515, 51.1657],
-  Canada: [-106.3468, 56.1304],
-  "United Arab Emirates": [53.8478, 23.4241],
-  Singapore: [103.8198, 1.3521],
-  Netherlands: [5.2913, 52.1326],
-  France: [2.2137, 46.2276],
-  Thailand: [100.9925, 15.87],
-  Mexico: [-102.5528, 23.6345],
-  // Add more countries as needed
-};
-
 export default function WorldMap() {
   const { data } = useAnalyticsOverview();
 
@@ -74,7 +56,6 @@ export default function WorldMap() {
         };
       })
       .filter((location): location is Location => Boolean(location)) || [];
-  console.log(locations);
 
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
   const [mousePosition, setMousePosition] = useState<{
@@ -178,7 +159,10 @@ export default function WorldMap() {
           }}
         >
           <div className="flex items-center gap-2">
-            <div className="w-4 h-3 bg-linear-to-r from-green-500 to-green-600 rounded-sm"></div>
+            <div
+              className="w-4 h-3 bg-linear
+            -to-r from-green-500 to-green-600 rounded-sm"
+            ></div>
             <span className="text-sm font-medium text-gray-900">
               {hoveredLocation}
             </span>

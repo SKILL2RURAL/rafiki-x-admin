@@ -40,8 +40,6 @@ const AnalyticsPage = () => {
   const { data: analyticsOverview, isLoading } = useAnalyticsOverview();
   const { data: subscriptionOverview } = useSubscriptionOverview();
 
-  console.log("Analytics Overview:", analyticsOverview);
-
   return (
     <div>
       {/* Metrics  */}

@@ -15,6 +15,8 @@ export interface AnalyticsOverview {
     newSignups: number;
     resumeUploads: number;
     totalUsers: number;
+    totalGuestUsers: number;
+    totalVerifiedUsers: number;
   };
 }
 
